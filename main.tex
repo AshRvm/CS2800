@@ -3,6 +3,15 @@
 \usepackage{latexsym}
 \usepackage{amsmath}
 \usepackage{amsfonts}
+\usepackage{mathtools}
+\DeclarePairedDelimiter{\ceil}{\lceil}{\rceil}
+\usepackage{geometry}
+ \geometry{
+ a4paper,
+ total={170mm,257mm},
+ left=20mm,
+ top=20mm,
+ }
 
 \title{Assignment1 - Part 1}
 \author{Aswin cs19b007, Ajith cs19b014, Aryan cs19b030}
@@ -15,12 +24,117 @@
 \newpage
 \begin{enumerate}
     \item\begin{enumerate}
-        \item abc
-        \item
+        \item The general algorithm for heap construction takes O($nlogn$) where n is the number of the nodes in the heap. That approach can be optimised by observing the fact that the leaf nodes need not be heapified since they follow the heap property (node value should be lesser than the children value since they do not have any children the property is satisfied). 
+        
+        Since heapify is not required for the leaf nodes, identify the position of the first non-leaf node and perform the heapify operation in the reverse order (heapify the subtree rooted with that node). 
+        
+        Psuedo code for the above algorithm(minHeap):
+        \begin{verbatim}
+        ConstructHeap(heap){
+            index = (n-1)/2     // last non-leaf node
+            for(i=index;i>=0;i--) Heapify(heap,i)
+        }
+        
+        Heapify(heap,i){
+            left = 2*i + 1
+            right = 2*i + 2
+            sm = i      // sm -> smallest
+            
+            if(left<heap_size & heap[left]<heap[sm]) sm = left
+            
+            if(right<heap_size & heap[right]<heap[sm]) sm = right
+            
+            if(sm!=i)
+                swap(heap[sm],heap[i])
+                // since the smallest node is swapped with parent, 
+                the swapped node may not form a heap with it's 
+                subtree. So recursively heapify that subtree //
+                Heapify(heap,sm) 
+            }
+        \end{verbatim}    
+        \item The number of leaves in a heap with n nodes is ceil(n/2).
+        
+        Proof : 
+        
+        Last leaf is nth index. Its parent is at index floor(n/2) and similarly,
+        there is no element such that its parent is floor(n/2+1)th element.
+        Thus leaves are indexed from floor(n/2) +1 to n.
+
+        Hence, total number of leaves = n - floor(n/2) = ceil(n/2).
+        
+        
+        For easier calculations let us assume a complete binary tree of height h. 
+        
+        The number of nodes n = \(2^{h+1}\) - 1. Each level i contains \(2^i\)
+        nodes. The level h contains all leafnodes.
+        
+        The bottom most level containing \(2^h\) nodes require 0 operations since the leaves follow the heap property. The level before the bottom most level containing \(2^{h-1}\), the nodes may go down by one level. Similarly the $ith$ level from the bottom containing \(2^{h-i}\) nodes may go down by i levels. Computing the no. of steps for the whole heap from bottom to top we get the time complexity as,
+        
+        \[ T(n) = \sum_{i=0}^{h} i 2^{h-i} = 2^h\sum_{i=0}^{h} i 2^{-i} \leq 2^h\sum_{i=0}^{\infty} i 2^{-i}\]
+        
+        $\sum_{i=0}^{\infty} i 2^{-i}$ is an AGP. The solution to this infinte AGP is:
+        
+        \[ \sum_{i=0}^{\infty} i x^{i} = \frac{x}{(1-x)^2} \]
+        
+        Substituting x = 1/2, in the above equation
+        
+        \[ \sum_{i=0}^{\infty} i 2^{-i} = \frac{1/2}{(1-1/2)^2} = 2\]
+        
+        \[ \Rightarrow{T(n) = 2^h\sum_{i=0}^{h} i 2^{-i} \leq 2^h (2) = 2^{h+1}} \]
+        
+        We know that n = \(2^{h+1}\) - 1,
+        
+        \[ \Rightarrow{T(n) \leq n+1} \]
+        
+        So, from the above calculation we can say that time complexity of the above mentioned heap construction algorithm is O($n$).
+        
+        
     \end{enumerate}
+    \item To evaluate a polynomial of degree n in linear time Horner's method can be used. Assume a polynomial $f(x)$ of degree n.
+    
+    \begin{equation} 
+    f(x) = a_nx^n + a_{n-1}x^{n-1} + .... + a_1x + a_0
+    \end{equation}
+    
+    The above equation can also be represented as,
+    
+    \begin{equation} 
+    f(x) = (((a_nx + a_{n-1})x + a_{n-2})x.....)x + a_0
+    \end{equation}
+    
+    From the above representation of the equation $f(x)$ we can observe a way of computation of $f(x)$ which is,
+    
+    Assume initially, \[ f(x_0) = a_n \] 
+    
+    In each step multiply the equation $f(x_0)$ with $x_0$ and add the next coefficient , in this case it's $a_{n-1}$  \[ f(x_0) = f(x_0)x_0 + a_{n-1}\]
+    \[ \Rightarrow{f(x_0) = a_nx_0 + a_{n-1}}\]
+    
+    Similarly in the next step multiply  with x and add the next coefficient
+    \[ f(x_0) = (a_nx_0 + a_{n-1})x_0 + a_{n-2}\]
+    \[.\]
+    \[.\]
+    \[.\]
+    \[.\]
+    \[f(x_0) = a_nx_0^n + a_{n-1}x_0^{n-1} + .... + a_1x_1 + a_0\]
+    
+    In each step we multiply by x and add the next coefficient, we do this n times so the total number of additions and multiplications is 2n.
+    \begin{verbatim}
+    Pseudo code:
+        function = 0
+        for(i=0 to n) function = function *x + a[n-i]
+    \end{verbatim}
+    
+    In the above algorithm by differentiating in every step using chain rule, the derivative can be computed.
+    \begin{verbatim}
+    Pseudo code:
+        function=0, derivative=0
+        for(i=0 to n) 
+            derivative = derivative *x + function
+            function = function *x + a[n-i]
+    \end{verbatim}
+    The derivative also requires n multiplications and n additions.  
     \item 
-    \item
-    \item Maintain a boolean array isPresent[n] stating whether the position in the permutation is already occupied or not.
+    \item Maintain a boolean array isPresent[n] stating whether the position in the permutation is already occupied or not, assuming indexing starts from 1.
     
     We can say that $i_1$ represents the position of 1 in the permutation, since all elements to the left of $i_1$ will be greater than 1. Set isPresent[$i_1$] as true.
     Similarly, continue for the other values, such that, if isPresent[$i_k$] is true, then keep increasing the index of isPresent till an index with value false appears. This will be the position of k in the permutation.
@@ -29,11 +143,65 @@
     
     The best case time complexity will be of n comparisons,\textit{(i.e)} the inversion vector is given by (n-1, n-2, .....1, 0).
     
-    The worst case time complexity will be $\frac{n(n-1)}{2}$ comparisons, \textit{(i.e)} O($n^2$), when the inversion matrix is given by (0,0,0....0,0)
-    in which case, for the $kth$ number, we have the isPresent array (k-1) times.
+    The worst case time complexity will be when the inversion matrix is given by (0,0,0....0,0) in which case, for the $kth$ number, we check the isPresent array (k-1) times.
+     \[ \sum_{i=1}^{n-1}i = \frac{n(n-1)}{2} \]
+     Thus, the worst case time complexity will be of O($N^2$)
     
-    TBC
-    \item
+    
+    \begin{verbatim}
+        for(int i=1;i<=n;i++){
+            position = inverse[i]+1     //adding one to start index from 1
+            while(isPresent[position] == true){
+                position++
+            }
+            permutation[position] = i
+            isPresent[position] = true
+        }
+    \end{verbatim}
+    Initial conditions ; \{isPresent[i] = false $\forall$ i $\epsilon$ [1,n]\}
+    
+    Loop invariants : \{(isPresent[i] $\epsilon$ \{true, false\} $\forall$ i $\epsilon$ [1,n]) $\cup$ (1 $\leq$ position $\leq$ n) \}
+    
+    Final conditions : \{isPresent[i] = true $\forall$ i $\epsilon$ [1,n]\}
+    
+    PROVE CORRECTNESS 
+    \item\begin{enumerate}
+        \item $M_1$ = max \{$W_1$(i,j,k)\} :
+        \begin{verbatim}
+        minValue = min(a[1], b[1], c[1])
+        maxValue = max(a[n], b[n], c[n])
+        M = maxValue - minValue
+        \end{verbatim}
+        Initial conditions : \{(minValue $\epsilon$ \{a[1], b[1], c[1]\}) $\cup$ (maxValue $\epsilon$ \{a[n], b[n], c[n]\})\} 
+        
+        Final conditions ; \{M = maxValue - minValue\}
+        \item$M_2$ = min \{$W_1$(i,j,k)\} : 
+        \begin{verbatim}
+            i=2, j=2, k=2
+            while(i,j,k <= n){
+                W1 = max(|a[i]-b[j]|, |b[j]-c[k]|, |c[k]-a[i]|)
+                minW1 = min(minW1, W1)
+                minTemp = min(a[i], b[j], c[k])
+                if(minTemp == a[i]) i++
+                else if(minTemp == b[j]) j++
+                else if(minTemp == c[k]) k++
+            }
+            M = minW1
+        \end{verbatim}
+        Initial conditions : \{(i=j=k=2) $\cup$ (minW1 = W1[1,1,1])\}
+        
+        Loop invariant : \{() $\cup$ () \}
+        
+        Final conditions : \{(max(i,j,k) = n+1) $\cup$ (M = min($W_1(i,j,k)$)\}
+        \item $M_3$ = max \{$W_2(i,j,k)$\} :
+        \begin{verbatim}
+            
+        \end{verbatim}
+        \item $M_4$ = min \{$W_2(i,j,k)$\} : 
+        \begin{verbatim}
+            
+        \end{verbatim}
+    \end{enumerate}
     \item
     \item
     \item
