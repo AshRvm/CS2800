@@ -8,13 +8,13 @@
 \usepackage{geometry}
  \geometry{
  a4paper,
- total={170mm,257mm},
- left=20mm,
- top=20mm,
+ total={170mm,257mm} ,
+ left=20mm ,
+ top=20mm ,
  }
 
 \title{Assignment1 - Part 1}
-\author{Aswin cs19b007, Ajith cs19b014, Aryan cs19b030}
+\author{Aswin cs19b007, Ajith cs19b014, Aryan cs19b030} 
 \date{\today}
 
 \begin{document}
@@ -24,7 +24,7 @@
 \newpage
 \begin{enumerate}
     \item\begin{enumerate}
-        \item The general algorithm for heap construction takes O($nlogn$) where n is the number of the nodes in the heap. That approach can be optimised by observing the fact that the leaf nodes need not be heapified since they follow the heap property (node value should be lesser than the children value since they do not have any children the property is satisfied). 
+        \item The general algorithm for heap construction takes O($nlogn$) where n is the number of the nodes in the heap. That approach can be optimised by observing the fact that the leaf nodes need not be  heapified since they follow the heap property (node value should be lesser than the children value since they do not have any children the property is satisfied). 
         
         Since heapify is not required for the leaf nodes, identify the position of the first non-leaf node and perform the heapify operation in the reverse order (heapify the subtree rooted with that node). 
         
@@ -40,11 +40,11 @@
             right = 2*i + 2
             sm = i      // sm -> smallest
             
-            if(left<heap_size & heap[left]<heap[sm]) sm = left
+            if(left<heap_size & heap[left]<heap[sm]) sm = left 
             
-            if(right<heap_size & heap[right]<heap[sm]) sm = right
+            if(right<heap_size & heap[right]<heap[sm]) sm = right 
             
-            if(sm!=i)
+            if(sm!=i) 
                 swap(heap[sm],heap[i])
                 // since the smallest node is swapped with parent, 
                 the swapped node may not form a heap with it's 
@@ -104,7 +104,10 @@
     
     From the above representation of the equation $f(x)$ we can observe a way of computation of $f(x)$ which is,
     
-    Assume initially, \[ f(x_0) = a_n \] 
+    Assume initially, \[ f(x_0) = 0 \]
+    Mutiply by $x_0$ and add $a_n$
+    \[ f(x_0) = f(x_0)x_0 + a_n \]
+    \[ \Rightarrow{f(x_0 = a_n}\]
     
     In each step multiply the equation $f(x_0)$ with $x_0$ and add the next coefficient , in this case it's $a_{n-1}$  \[ f(x_0) = f(x_0)x_0 + a_{n-1}\]
     \[ \Rightarrow{f(x_0) = a_nx_0 + a_{n-1}}\]
@@ -115,7 +118,8 @@
     \[.\]
     \[.\]
     \[.\]
-    \[f(x_0) = a_nx_0^n + a_{n-1}x_0^{n-1} + .... + a_1x_1 + a_0\]
+    \[ f(x_0) = (((a_nx_0 + a_{n-1})x_0 + a_{n-2})x_0.....)x_0 + a_0 \]
+    \[f(x_0) = a_nx_0^n + a_{n-1}x_0^{n-1} + .... + a_1x_0 + a_0\]
     
     In each step we multiply by x and add the next coefficient, we do this n times so the total number of additions and multiplications is 2n.
     \begin{verbatim}
@@ -133,7 +137,50 @@
             function = function *x + a[n-i]
     \end{verbatim}
     The derivative also requires n multiplications and n additions.  
-    \item 
+    \item \textbf{Heap construction:}
+    
+    \underline{Loop invariant} - All the indices greater than i(loop variable) heap[i+1..n], before each iteration of heapify follow the heap property.
+    
+    \underline{Proof of correctness}
+    
+    Initial step - The loop invariant should be true before the first iteration of the loop. This is true since, the loop starts from the first non-leaf which has all leaf nodes after it. All the leaf nodes satisfy heap property 
+    
+    To prove - If the loop invariant is true for iteration i, it is true for iteration (i-1).
+    
+    Given that heap[(i+1)..n] follow the heap property. Iteration i heapifies the $ith$ node by swapping(if necessary) with it's children(2i+1,2i+2) subtree and maybe further swapping in the subtree. Children subtrees follow the heap property since, i $<$ 2i+1, 2i+2 which according to our loop invariant follow the heap property. So, the $ith$ node is heapified with two other heaps(subtree rooted with their children) which follow heap property. Hence after heapifying the $ith$ node now A[i..n] follow the heap property which is the loop invariant for the next iteration. 
+    
+    Termination - The loop invariant is true on the entire input.
+    
+    After the loop terminates i=-1, from the loop invariant A[0..n] follow the heap property \textit{(i.e)} the whole input follows the heap property.
+    
+    \textbf{Polynomial evaluation:}
+    
+    \underline{Loop invariant} - 
+    
+    \[ \sum_{k=0}^{i} a_{n-i+k} x^{k}\]
+    
+    \underline{Proof of correctness :}
+    
+    Initial condition : y = $f(x_0)$ is initialised to 0 \textit{(i.e)} y = 0
+    
+    Maintenance : By using the loop invariant after $(i+1)th$ iteration
+    
+    \[ y = a_{n-(i+1)} + x\sum_{k=0}^{i} a_{n-i+k} x^{k} \]
+    
+    \[ \Rightarrow{ y = a_{n-(i+1)}x^0 + \sum_{k=0}^{i} a_{n-i+k} x^{k+1} } \]
+    
+    \[ \Rightarrow{ y = \sum_{k=0}^{i} a_{n-(i+1)+(k+1)} x^{k+1} + a_{n-(i+1)}x^0 } \]
+    
+    \[ \Rightarrow{ y = \sum_{k=1}^{i+1} a_{n-(i+1)+k} x^{k} + a_{n-(i+1)}x^0 } \]
+    
+    \[ \Rightarrow{ y = \sum_{k=0}^{i+1} a_{n-(i+1)+k} x^{k} } \]
+    
+    Termination - The loop terminates after i = n, the loop invariant becomes
+    
+    \[ y = \sum_{k=0}^{n} a_{k} x^{k}\]
+    
+    This is the given polynomial equation.
+    
     \item Maintain a boolean array isPresent[n] stating whether the position in the permutation is already occupied or not, assuming indexing starts from 1.
     
     We can say that $i_1$ represents the position of 1 in the permutation, since all elements to the left of $i_1$ will be greater than 1. Set isPresent[$i_1$] as true.
@@ -164,7 +211,18 @@
     
     Final conditions : \{isPresent[i] = true $\forall$ i $\epsilon$ [1,n]\}
     
-    PROVE CORRECTNESS 
+    \underline{Proof of correctness}:
+    
+    Base case: for n=1, the permutation will be \{1\}, \textit{(i.e)} isPresent[i] = true $\forall$ i $\epsilon$ [1,n]
+    
+    Inductive hypothesis: for n=k, the permutation given by the inversion matrix \{$i_1$,$i_2$,....$i_k$\} can be constructed. 
+    
+    To prove: for n=k+1, the permutation given by the inversion matrix \{$i_1$,$i_2$,....$i_k$,$i_{k+1}$\} can be constructed, given that any permutation of length k can be constructed with it's inversion matrix
+    
+    For a given permutation of length k whose inversion matrix is given by \{$j_1$,$j_2$,....$j_k$\}, increase all the elements by 1. The inversion matrix will not be affected by this change. Now to construct a permutation given by the inversion matrix \{$i_1$,$i_2$,....$i_k$,$i_{k+1}$\}, we take $i_{a+1}$ = $j_a$ $\forall$ a $\epsilon$ [1,k]. To finish the construction, we need to add 1 into the modified permutation of length k. This can be done by shifting all the elements whose index is greater than $i_1$ (since indexing starts at 1) to the right by one position and filling the index $i_1+1$ with 1. This too won't affect the values of the other elements in the inversion matrix, since 1 is smaller than all the shifted elements.
+    
+    Therefore, isPresent[i] $\forall$ i $\epsilon$ [1,n] is true and thus, a permutation can be constructed using its inversion matrix.
+    
     \item\begin{enumerate}
         \item $M_1$ = max \{$W_1$(i,j,k)\} :
         \begin{verbatim}
@@ -186,26 +244,181 @@
                 else if(minTemp == b[j]) j++
                 else if(minTemp == c[k]) k++
             }
-            M = minW1
+            M2 = minW1
         \end{verbatim}
         Initial conditions : \{(i=j=k=2) $\cup$ (minW1 = W1[1,1,1])\}
         
-        Loop invariant : \{() $\cup$ () \}
+        Loop invariants : \{() $\cup$ () \}
         
         Final conditions : \{(max(i,j,k) = n+1) $\cup$ (M = min($W_1(i,j,k)$)\}
         \item $M_3$ = max \{$W_2(i,j,k)$\} :
+        
+        We check each combination of taking either 2 at a time, \textit{(i.e)} taking (a,b), (b,c), and (c,a) as the upper and lower limits, since for the maximum of $W_2$, we need to find the three points such that the distance between the 2 closest points need to be the largest, which might not be the case when the lower limit is taken as the min(a[1],b[1],c[1]) and the upper limit as max(a[n],b[n],c[n]), since the element of the other closest to the mean of the upper limit and lower limit, might be far away from the mean 
         \begin{verbatim}
-            
+            Assuming the limits as part of arrays 'a' and 'c'
+            Case-1: 
+                min = a[1]
+                max = c[n]
+                while( |a[1]-b[i]| < |c[n]-b[i]| ){
+                    i++
+                }
+                tempMin1 = min(|a[1]-b[i-1]| , |b[i]-c[n]|)
+            Case-2:
+                min = c[1]
+                max = a[n]
+                while( |c[1]-b[i]| < |a[n]-b[i]|){
+                    i++
+                }
+                tempMin2 = min(|c[1]-b[i-1]| , |b[i]-c[n]|)
+                
+            tempM3(c,a) = max(tempMin1, tempMin2)
+            M3 = max(tempM3(a,b), tempM3(b,c), tempM3(c,a))
         \end{verbatim}
         \item $M_4$ = min \{$W_2(i,j,k)$\} : 
         \begin{verbatim}
-            
+            i=2, j=2, k=2
+            while(i,j,k <= n){
+                W2 = min(|a[i]-b[j]|, |b[j]-c[k]|, |c[k]-a[i]|)
+                minW2 = min(minW2, W2)
+                minTemp = min(a[i], b[j], c[k])
+                if(minTemp == a[i]) i++
+                else if(minTemp == b[j]) j++
+                else if(minTemp == c[k]) k++
+            }
+            M4 = minW2
         \end{verbatim}
+        Initial conditions ; \{(i=j=k=2)$\cup$($W_2$ = min($|$a[1]-b[1]$|$, $|$b[1]-c[1]$|$, $|$c[1]-a[1]$|$))\}
+        
+        Loop invariants : \{(i,j,k $\leq$ n)$\cup$($minW_2$ $\epsilon$ \{$W_2$[i,j,k]\})\}
+        
+        Final conditions ; \{($minW_2$ = min($W_2[i,j,k]$))\}
     \end{enumerate}
     \item
+    The common element can be found by incrementing the smallest of the set(a[i], b[j], c[k]) one by one, until all three are equal. 4 comparisons will be needed for each increament, to check if the values are equal, otherwise to find the minimum. Thus, in the worst case scenario, in which the common element is the last element in each array, the total number of comparisons will be :
+    \[ \sum_{i=1}^{p}4 +  \sum_{j=1}^{q}4 + \sum_{k=1}^{r}4\]
+    Therefore, the time complexity of the program will be of O(p+q+r)
+    
+    \textbf{Pseudo-code :}
+    \begin{verbatim}
+        while((i <= p) && (j <= q) && (k <= r)){
+            if((a[i] == b[j]) && (b[j] == c[k])){
+                return (a[i],i,j,k)
+            }else{
+                temp = min(a[i],b[j],c[k])
+                if(temp == a[i]) i++
+                if(temp == b[j]) j++
+                if(temp == c[k]) k++
+            }
+        }
+    \end{verbatim}
+    
+    \textbf{EXTRA-1} : 
+    The naive algorithm of O($nm^2$) can be obtained by using the first row as reference. For each element in the first row, every other row is checked for whether that element is present in the row. If it is not present in every other row, then check with the next element in the reference row.
+    The time complexity will be:
+    \[\sum_{i=1}^{m}(n-1)*\sum_{j=1}^{m}1 = (n-1)*m^2 \]
+    \textbf{Pseudo-code :}
+    \begin{verbatim}
+        i=1,j=2;k=1
+        position[1....n] = 0
+        for(i=1;i<=m;i++){
+            for(j=2;j<=n;j++){
+                for(k=1;k<=m;k++){
+                    if(a[1][i] == a[j][k]){
+                        position[j] = k
+                        break
+                    }
+                }
+                if(k == m+1) break
+            }
+            if(j == n+1){
+                position[1] = i
+                return (position)
+            }
+        }
+    \end{verbatim}
+    Initial conditions : \{i=1,k=1,j=2\}
+    
+    Loop invariants : \{(i,k$\leq$m) $\cup$ (j$\leq$n) $\cup$ (position[a] $\epsilon$ [0,m])\}
+    
+    Final conditions ; \{position[a] $\epsilon$ [1,m]\}
+    
+    A more efficient algorithm can be achieved by using an incremental procedure. We compare the least elements in each row. If they are equal, then return the positions and the value. Else, increment all rows except the row with the highest minimum value. Since there exists a common element, continue this until all the minimum elements are equal.The time complexity will be: 
+    \[\sum_{i=1}^{m}2*(n-1) = 2m(n-1)\]
+    The max of the minimum values can be found with (n-1) comparisons and we will have to increment to the mth value of each row at most, incrementing (n-1) rows at a time. Thus the time complexity of the algorithm is of $O(nm)$.
+    
+    \textbf{Pseudo-code :}
+    \begin{verbatim}
+        indices[1...n] = 1
+        while(max(indices[...] <= m){
+            for(i=1;i<n;i++){
+                if(a[i][indices[i]] != a[i+1][indices[i+1]]) break
+            }
+            if(i == n) break
+            for(i=1;i<=n;i++){
+                if(maxTemp < a[i][indices[i]]){
+                    maxTemp = a[i][indices[i]]
+                    maxIndex = i
+                }
+            }
+            for(v in [1,n]-{i}){
+                indices[v]++
+            }
+        }
+        return (a[i][indices[i]], indices)
+    \end{verbatim}
+    Initial conditions : 
     \item
+    (Read 8th first)
+    Along with the relations used in 8-c we also use two additional equations:
+    \begin{equation*}
+        D_j'(x) = D_{j-1}'(x) * (x-x_j) + D_{j-1}(x).
+    \end{equation*}
+    \begin{equation*}
+        G_j'(x) = (y_j - G_{j-1}(x_j)) \frac{D_{j-1}'(x)}{D_{j-1}(x_j)} + G_{j-1}'(x)
+    \end{equation*}
+    with base cases $G_0'(x) = 0$ and $D_0'(x) = 0$.
+    The order of computation would be finding $D_j(x)$ first then $D_j'(x)$ and then $G_j(x)$ and finally $G_j'(x)$ in a single loop run.
+    Now computing all these at jth point is again linear in j(similar to 8). so again the total number of steps is c*1 + c*2 + ...c*n = c*n(n+1)/2 which is again $O(n^2)$
     \item
+    \begin{enumerate}
+        \item Let $S_i(x) = \prod_{i\neq j,1 \leq j \leq n} \frac{x-x_j}{x_i-x_j}$
+Now,We can see that $S_i(x_j)$ is 0 if $i \neq j$ and 1 if $i = j$.This is because if $i \neq j$, there is $x-x_j$ as a factor of $S_i(x)$ so its value becomes 0.If i = j then after substituting $x_i$ in x, every factor in numerator gets cancelled with denominator giving 1.
+So this $S_i(x)$ is similar to Kronecker delta function.
+\begin{equation*}
+    S_i(x_j) = \delta_{ij}
+\end{equation*}
+Now our polynomial A(x) is linear combination of $S_i(x)$ for $1 \leq i \leq n$.
+\begin{equation*}
+    A(x) = \sum_{1 \leq i \leq n}{y_i S_i(x)}
+\end{equation*}
+So for any $x_i(1 \leq i \leq n) , A(x_i) = y_i S_i(x_i)$.But $S_i(x_i)=1$, so $A(x_i)=y_i$.Hence
+the polynomial A(x) satisfies all n points.
+\item
+The naive algorithm calculates each $S_i$ individually.To compute each $S_i$, The numerator is a polynomial and requires $O(n^2)$ steps to compute its coefficients naively.Once numerator is known denominator can be computed using Horner's method in O(n) or just subtract and multiply n-1 times which is also in O(n) steps.So the overall complexity is $O(n^3)$ because each $S_i$ takes $O(n^2)$ steps.
+Now calculation of numerator:
+Assume numerator has roots $a_1,a_2....a_n-1$ where these $a_i$s' are $x_i$ where one $x_i$ is missing.Lets use an incremental algorithm where we have polynomial with roots $a_1,a_2....a_k$(let it be $P_{k}(x)$ already and we have to add $a_{k+1}$ as root to get $P_{k+1}(x)$.Let coefficients of $P_k(x)$ be in array p where p[i] is coefficient of $x^i$ and coefficients of $P_{k+1}(x)$ be in array q, where q[i] is coefficient of $x^i$.Now following pseudo code will get q from p:
+    \begin{verbatim}
+    q[0] = -p[0] * a[k]; //a[k] is k+1 th root
+    for(int i = 1;i <= k;i++)
+    {
+        q[i] = p[i-1] - p[i]*a[k];
+    }
+    q[k+1] = 1;
+    \end{verbatim}
+Starting with polynomial 1,we can keep on adding $a_i$s as roots and achieve the final polynomial using above code.This takes 2k steps for kth root,now for computing $S_i$ this 2k is to be summed over 1,2,....n-1 which is (n-1)*n steps for each $S_i$.Now the total number of steps = n*(n-1)*n which is $O(n^3)$.
+\item
+We use two recurrence relations:
+\begin{equation*}
+D_j(x) = D_{j-1}(x) *(x - x_{j})
+\end{equation*}
+and 
+\begin{equation*}
+G_j(x) = (y_j - G_{j-1}(x_j)) \frac{D_{j-1}(x)}{D_{j-1}(x_j)} + G_{j-1}(x)
+\end{equation*}
+with base cases $D_0(x) = 1$ and $G_0(x) = 0$.
+Now all $D_j$s' can be calculated in $O(n^2)$ from 8-b.Now each $G_{j-1}(x_j)$ takes 2j steps using Horner's method,Similarly $D_{j-1}$ takes 2j steps and addition of coefficients after multiplying also take linear steps in j.
+So each $G_j(x)$ takes c*j steps. So to calculate $G_n(x)$ we do c*1 + c*2 +.....c*n = c *n*(n+1)/2 steps. So the order becomes $O(n^2)$.
+\end{enumerate}
     \item
 \end{enumerate}
-
 \end{document}
