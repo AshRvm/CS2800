@@ -13,7 +13,7 @@
  top=20mm ,
  }
 
-\title{Assignment1 - Part 1}
+\title{Assignment1}
 \author{Aswin cs19b007, Ajith cs19b014, Aryan cs19b030} 
 \date{\today}
 
@@ -51,7 +51,8 @@
                 subtree. So recursively heapify that subtree //
                 Heapify(heap,sm) 
             }
-        \end{verbatim}    
+        \end{verbatim}
+        
         \item The number of leaves in a heap with n nodes is ceil(n/2).
         
         Proof : 
@@ -315,7 +316,7 @@
     \textbf{EXTRA-1} : 
     The naive algorithm of O($nm^2$) can be obtained by using the first row as reference. For each element in the first row, every other row is checked for whether that element is present in the row. If it is not present in every other row, then check with the next element in the reference row.
     The time complexity will be:
-    \[\sum_{i=1}^{m}(n-1)*\sum_{j=1}^{m}1 = (n-1)*m^2 \]
+    \[\sum_{i=1}^{m}(n-1)\sum_{j=1}^{m}1 = (n-1)*m^2 \]
     \textbf{Pseudo-code :}
     \begin{verbatim}
         i=1,j=2;k=1
@@ -328,9 +329,9 @@
                         break
                     }
                 }
-                if(k == m+1) break
+                if(k == m+1) break  //a[1][i] isn't present in row j
             }
-            if(j == n+1){
+            if(j == n+1){           //every row contains a[1][i]
                 position[1] = i
                 return (position)
             }
@@ -367,19 +368,7 @@
         return (a[i][indices[i]], indices)
     \end{verbatim}
     Initial conditions : 
-    \item
-    (Read 8th first)
-    Along with the relations used in 8-c we also use two additional equations:
-    \begin{equation*}
-        D_j'(x) = D_{j-1}'(x) * (x-x_j) + D_{j-1}(x).
-    \end{equation*}
-    \begin{equation*}
-        G_j'(x) = (y_j - G_{j-1}(x_j)) \frac{D_{j-1}'(x)}{D_{j-1}(x_j)} + G_{j-1}'(x)
-    \end{equation*}
-    with base cases $G_0'(x) = 0$ and $D_0'(x) = 0$.
-    The order of computation would be finding $D_j(x)$ first then $D_j'(x)$ and then $G_j(x)$ and finally $G_j'(x)$ in a single loop run.
-    Now computing all these at jth point is again linear in j(similar to 8). so again the total number of steps is c*1 + c*2 + ...c*n = c*n(n+1)/2 which is again $O(n^2)$
-    \item
+    \item[8.]
     \begin{enumerate}
         \item Let $S_i(x) = \prod_{i\neq j,1 \leq j \leq n} \frac{x-x_j}{x_i-x_j}$
 Now,We can see that $S_i(x_j)$ is 0 if $i \neq j$ and 1 if $i = j$.This is because if $i \neq j$, there is $x-x_j$ as a factor of $S_i(x)$ so its value becomes 0.If i = j then after substituting $x_i$ in x, every factor in numerator gets cancelled with denominator giving 1.
@@ -419,6 +408,62 @@ with base cases $D_0(x) = 1$ and $G_0(x) = 0$.
 Now all $D_j$s' can be calculated in $O(n^2)$ from 8-b.Now each $G_{j-1}(x_j)$ takes 2j steps using Horner's method,Similarly $D_{j-1}$ takes 2j steps and addition of coefficients after multiplying also take linear steps in j.
 So each $G_j(x)$ takes c*j steps. So to calculate $G_n(x)$ we do c*1 + c*2 +.....c*n = c *n*(n+1)/2 steps. So the order becomes $O(n^2)$.
 \end{enumerate}
-    \item
+ \item[7.]
+    Along with the relations used in 8-c we also use two additional equations:
+    \begin{equation*}
+        D_j'(x) = D_{j-1}'(x) * (x-x_j) + D_{j-1}(x).
+    \end{equation*}
+    \begin{equation*}
+        G_j'(x) = (y_j - G_{j-1}(x_j)) \frac{D_{j-1}'(x)}{D_{j-1}(x_j)} + G_{j-1}'(x)
+    \end{equation*}
+    with base cases $G_0'(x) = 0$ and $D_0'(x) = 0$.
+    The order of computation would be finding $D_j(x)$ first then $D_j'(x)$ and then $G_j(x)$ and finally $G_j'(x)$ in a single loop run.
+    Now computing all these at jth point is again linear in j(similar to 8). so again the total number of steps is c*1 + c*2 + ...c*n = c*n(n+1)/2 which is again $O(n^2)$
+    \item[9.]
+\end{enumerate}
+\begin{enumerate}
+    \item[22.4-2/32.3.] The number of paths from one node to another in a DAG can be found in linear time, \textit{(i.e)} in O(n+m), using the dfs algorithm. We maintain two arrays of size n, storing the number of paths from that node to the destination node, and another , stating whether the node has already been visited in the dfs traversal. Here, a node is said to be visited, if the dfs call of that node has initiated or had completed.
+    
+    \textbf{Pseudo-code :}
+    \begin{verbatim}
+        int NumPaths(vertex start, vertex end, int* numPaths, bool* isVisited){
+            int sum = 0
+            isVisited[start] = true
+            for(v in adjacencyMatrix[start]){
+                if(v == end) sum++
+                else if(isVisited[v] == true) sum += numPaths[v]
+                else sum += NumPaths(v, end, numPaths, isVisited)
+            }
+            numPaths[start] = sum
+            return (sum)
+        }
+    \end{verbatim}
+    \item[3.24.] Sort the vertices topologically. So, now in the topologically sorted order we have all the edges directed to one side, without loss of generality we can assume right. 
+    
+    In a graph G, if it has to contain a directed path passing through every vertex then there must be an edge connecting all adjacent vertices in the topologically sorted order.
+    
+    \textbf{Proof:-}
+    
+    Suppose there is a directed path P which is passing through all the vertices in G but does not follow the above property.Let the graph G contain n vertices 
+    
+    Let us assume the topologically sorted order of vertices is given by toposort[0..(n-1)]
+    
+    Suppose there is no edge between toposort[i] $(i\neq(n-1))$ and toposort[i+1]. But since P is passing through all the vertices there exists a path P' from toposort[i] to toposort[i+1]. 
+    
+    \underline{Case1 }:
+    Let us assume the immediate vertex in P' after toposort[i] be toposort[j], $j>i$ and $j\neq(i+1)$ . 
+    
+    \[ \Rightarrow P' = ( toposort[i],toposort[j],...,toposort[i+1] )  \]
+    
+    But this is not possible since P' can not go from toposort[j] to toposort[i+1] since j $>$ (i+1) there can not be any backward edges as the vertices are in topological order.
+    
+    \underline{Case2 }:
+    There are no intermediate vertices in P' \textit{(i.e)} P' = {toposort[i],toposort[i+1]}, but this is clearly a contradiction since we have assumed there is no edge between toposort[i],toposort[i+1].
+    
+    \textbf{Time complexity :-}
+    
+    The topological sorting of the vertices take O(V+E) time since it performs a DFS. After the topological sorting, for checking if there is an edge between every adjacent vertex takes O(V) time.
+    
+    So the overall time = O(V+E)
 \end{enumerate}
 \end{document}
