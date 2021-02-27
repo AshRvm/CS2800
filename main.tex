@@ -53,15 +53,15 @@
             }
         \end{verbatim}
         
-        \item The number of leaves in a heap with n nodes is ceil(n/2).
+        \item The number of leaves in a heap with n nodes is $\lceil n/2 \rceil$ .
         
         Proof : 
         
-        Last leaf is nth index. Its parent is at index floor(n/2) and similarly,
-        there is no element such that its parent is floor(n/2+1)th element.
-        Thus leaves are indexed from floor(n/2) +1 to n.
+        Last leaf is nth index, it's parent is at index $\lfloor n/2 \rfloor$ so
+        there is no element such that its parent is $\lfloor (n/2 +1) \rfloor$th element.
+        Thus leaves are indexed from $\lfloor n/2 \rfloor$ +1 to n.
 
-        Hence, total number of leaves = n - floor(n/2) = ceil(n/2).
+        Hence, total number of leaves = n - $\lfloor n/2 \rfloor$ = $\lceil n/2 \rceil$.
         
         
         For easier calculations let us assume a complete binary tree of height h. 
@@ -182,33 +182,34 @@
     
     This is the given polynomial equation.
     
-    \item Maintain a boolean array isPresent[n] stating whether the position in the permutation is already occupied or not, assuming indexing starts from 1.
+    \item Maintain a boolean array isPresent[n] stating whether the position in the permutation is already occapied or not, assuming indexing starts from 1.
     
-    We can say that $i_1$ represents the position of 1 in the permutation, since all elements to the left of $i_1$ will be greater than 1. Set isPresent[$i_1$] as true.
-    Similarly, continue for the other values, such that, if isPresent[$i_k$] is true, then keep increasing the index of isPresent till an index with value false appears. This will be the position of k in the permutation.
-    
-    This is similar to the Open Addressing method to avoid collisions in a hash table.
-    
-    The best case time complexity will be of n comparisons,\textit{(i.e)} the inversion vector is given by (n-1, n-2, .....1, 0).
-    
-    The worst case time complexity will be when the inversion matrix is given by (0,0,0....0,0) in which case, for the $kth$ number, we check the isPresent array (k-1) times.
-     \[ \sum_{i=1}^{n-1}i = \frac{n(n-1)}{2} \]
-     Thus, the worst case time complexity will be of O($N^2$)
-    
-    
+    We can say that $i_1$ represents the position of 1 in the permutation, since all elements to the left of $i_1$ will be greater than 1. Set isPresent[$i_1$] as true. For the other elements, going from 2 to n, traverse through the permutation till the ($i_k$ + 1)th empty position is found, and place it there. 
+
+    We can say that the number of searches in the permutation till we find the $i_k$th empty spot will be less than or equal to $i_k$ + (k-1), $(\textit{i.e})$ the sum of number of empty positions to be searched + the number of elements already placed in the permutation. We can also say that $i_k$ will be less than or equal to n-k, since it represents the number of elements greater than k, to the left of it, $(\textit{i.e})$ all elements greater than it lies on it's left in the permutation.
+     \[T(n) \leq \sum_{i=1}^{n}(i_k + k-1)\]
+     \[i_k \leq n-k\]
+     \[\Rightarrow T(n) \leq \sum_{i=1}^{n}(n-k + k-1)\]
+     \[\Rightarrow T(n) \leq \sum_{i=1}^{n}(n-1)\]
+     \[\Rightarrow T(n) \leq (n)(n-1)\]
+     \[T(n) = O(n^2)\]
+    \textbf{Pseudo-code :}
     \begin{verbatim}
         for(int i=1;i<=n;i++){
-            position = inverse[i]+1     //adding one to start index from 1
-            while(isPresent[position] == true){
-                position++
+            numEmpty = 0
+            tempPosition = 0
+            while(numEmpty <= inversions[i]){
+                tempPosition++
+                if(isPresent[tempPosition] == false) numEmpty++
             }
-            permutation[position] = i
-            isPresent[position] = true
+            if(tempPosition > n) return (-1)  //the inversion vector is invalid
+            permutation[tempPosition] = i
+            isPresent[tempPosition] = true
         }
     \end{verbatim}
     Initial conditions ; \{isPresent[i] = false $\forall$ i $\epsilon$ [1,n]\}
     
-    Loop invariants : \{(isPresent[i] $\epsilon$ \{true, false\} $\forall$ i $\epsilon$ [1,n]) $\cup$ (1 $\leq$ position $\leq$ n) \}
+    Loop invariants : \{(isPresent[i] $\epsilon$ \{true, false\} $\forall$ i $\epsilon$ [1,n]) $\cap$ (1 $\leq$ tempPosition $\leq$ n) \}
     
     Final conditions : \{isPresent[i] = true $\forall$ i $\epsilon$ [1,n]\}
     
@@ -216,27 +217,43 @@
     
     Base case: for n=1, the permutation will be \{1\}, \textit{(i.e)} isPresent[i] = true $\forall$ i $\epsilon$ [1,n]
     
-    Inductive hypothesis: for n=k, the permutation given by the inversion matrix \{$i_1$,$i_2$,....$i_k$\} can be constructed. 
+    Inductive hypothesis: for n=k, the permutation given by the inversion vector \{$i_1$,$i_2$,....$i_k$\} can be constructed. 
     
-    To prove: for n=k+1, the permutation given by the inversion matrix \{$i_1$,$i_2$,....$i_k$,$i_{k+1}$\} can be constructed, given that any permutation of length k can be constructed with it's inversion matrix
+    To prove: for n=k+1, the permutation given by the inversion vector \{$i_1$,$i_2$,....$i_k$,$i_{k+1}$\} can be constructed, given that any permutation of length k can be constructed with it's inversion vector
     
-    For a given permutation of length k whose inversion matrix is given by \{$j_1$,$j_2$,....$j_k$\}, increase all the elements by 1. The inversion matrix will not be affected by this change. Now to construct a permutation given by the inversion matrix \{$i_1$,$i_2$,....$i_k$,$i_{k+1}$\}, we take $i_{a+1}$ = $j_a$ $\forall$ a $\epsilon$ [1,k]. To finish the construction, we need to add 1 into the modified permutation of length k. This can be done by shifting all the elements whose index is greater than $i_1$ (since indexing starts at 1) to the right by one position and filling the index $i_1+1$ with 1. This too won't affect the values of the other elements in the inversion matrix, since 1 is smaller than all the shifted elements.
+    For a given permutation of length k whose inversion vector is given by \{$j_1$,$j_2$,....$j_k$\}, increase all the elements by 1. The inversion vector will not be affected by this change. Now to construct a permutation given by the inversion vector \{$i_1$,$i_2$,....$i_k$,$i_{k+1}$\}, we take $i_{a+1}$ = $j_a$ $\forall$ a $\epsilon$ [1,k]. To finish the construction, we need to add 1 into the modified permutation of length k. This can be done by shifting all the elements whose index is greater than $i_1$ (since indexing starts at 1) to the right by one position and filling the index $i_1+1$ with 1. This too won't affect the values of the other elements in the inversion vector, since 1 is smaller than all the shifted elements.
     
-    Therefore, isPresent[i] $\forall$ i $\epsilon$ [1,n] is true and thus, a permutation can be constructed using its inversion matrix.
+    Therefore, isPresent[i] $\forall$ i $\epsilon$ [1,n] is true and thus, a permutation can be constructed using its inversion vector.
     
     \item\begin{enumerate}
         \item $M_1$ = max \{$W_1$(i,j,k)\} :
+        
+        To find the two points(belonging to different arrays) who are the furthest apart, irrespective of the third point.
         \begin{verbatim}
         minValue = min(a[1], b[1], c[1])
         maxValue = max(a[n], b[n], c[n])
-        M = maxValue - minValue
+        if((minValue == c[1]) and (maxValue == c[n])){ 
+        //similarly check for other arrays
+            temp1 = max(a[n],b[n]) - c[1]
+            temp2 = c[n] - min(a[1],b[1])
+            M1 = max(temp1, temp2)
+        }else M1 = maxValue - minValue
         \end{verbatim}
-        Initial conditions : \{(minValue $\epsilon$ \{a[1], b[1], c[1]\}) $\cup$ (maxValue $\epsilon$ \{a[n], b[n], c[n]\})\} 
+        Initial conditions : \{(minValue $\epsilon$ \{a[1], b[1], c[1]\}) $\cap$ (maxValue $\epsilon$ \{a[n], b[n], c[n]\})\} 
         
         Final conditions ; \{M = maxValue - minValue\}
+        
+        Correctness of the algorithm :
+        
+        Without loss of generality, we can assume a[1] to be the least of \{a[1], b[1], c[1]\} and c[n] to be the largest of \{a[n], b[n], c[n]\}. a[1] will be the least and c[n] will be the largest element from the set \{a[1..n], b[1..n], c[1..n]\} since a[1] is smaller than the other elements of array 'a', and because a[1] is less than b[1] and c[1], it will be less than the other elements of the array 'b' and 'c'. Similarly, we can say that c[n] will be the largest element. Thus the maximum value of $M_!$ will be achieved at [1,j,n], j $\epsilon$ [1,n]
+        and it's value will be c[n] - a[1].
+        
+        But if both the largest and least element of the set \{a[1..n], b[1..n], c[1..n]\} belong to the same array, assuming it to be 'c' without loss of generality, then $M_1$ will be the larger one of (c[n]-min(a[1],b[1])) and (max(a[n],b[n]) - c[1]) 
         \item$M_2$ = min \{$W_1$(i,j,k)\} : 
+        
+        To find three points(belonging to different arrays) such that the distance between the largest point and the smallest point is the least among all other pairs.
         \begin{verbatim}
-            i=2, j=2, k=2
+            i=1, j=1, k=1
             while(i,j,k <= n){
                 W1 = max(|a[i]-b[j]|, |b[j]-c[k]|, |c[k]-a[i]|)
                 minW1 = min(minW1, W1)
@@ -247,16 +264,28 @@
             }
             M2 = minW1
         \end{verbatim}
-        Initial conditions : \{(i=j=k=2) $\cup$ (minW1 = W1[1,1,1])\}
+        Initial conditions : \{(i=j=k=1) $\cap$ (minW1 = W1[1,1,1])\}
         
-        Loop invariants : \{() $\cup$ () \}
+        Loop invariants : \{M2 = min(minW1, min(W1[i..n,j..n,k..n]))\}
         
-        Final conditions : \{(max(i,j,k) = n+1) $\cup$ (M = min($W_1(i,j,k)$)\}
+        Final conditions : \{(max(i,j,k) = n+1) $\cap$ (M2 = min($W_1[1..n,1..n,1..n]$)\}
+        
+        Correctness of the algorithm : 
+        
+        First lets prove loop invariant.
+        Its true initially(M2 = min(minW1,W1[1..n,1..n,1..n],since minw1 is initialized as infinity, W1[1..n,1..n,1..n] is definition of M2.
+        Now assume its true for l iterations.Using this lets prove it for l+1 iteration,in l+1th iteration we consider all triplets which contain minimum element among remaining elements, among these triplets, the triplet whose elements are minimum elements of each array (i..n,j..n,k..n) is the triplet with best possible answer.This can be proved easily.
+        Since all triplets that contain elements less than l+1th smallest element are already considered,now considering this triplet,minW1 also contains minimum of all the triplets that contain l+1th element too.Hence by induction the statement is true.
+        \\The terminating condition of the loop is max(i,j,k) = n+1. At terminating condition, the loop invariant will be M2 = min(minW1, min(W1[i+1..n,j+1..n,k+1..n]), but the second term doesn't exist. Therefore, M2 = minW1        
         \item $M_3$ = max \{$W_2(i,j,k)$\} :
+
         
-        We check each combination of taking either 2 at a time, \textit{(i.e)} taking (a,b), (b,c), and (c,a) as the upper and lower limits, since for the maximum of $W_2$, we need to find the three points such that the distance between the 2 closest points need to be the largest, which might not be the case when the lower limit is taken as the min(a[1],b[1],c[1]) and the upper limit as max(a[n],b[n],c[n]), since the element of the other closest to the mean of the upper limit and lower limit, might be far away from the mean 
+        To find the three points(belonging to different arrays) such that the distance between the closest two points is the largest among all other pairs.
+        
+        We check each combination of taking either 2 arrays at a time, \textit{(i.e)} taking (a,b), (b,c), and (c,a) as the upper and lower limits, since to find the maximum of $W_2$, we need to find the three points such that the distance between the 2 closest points need to be the largest, which might not be the case when the lower limit is taken as the min(a[1],b[1],c[1]) and the upper limit as max(a[n],b[n],c[n]), since the element of the other closest to the mean of the upper limit and lower limit, might be far away from the mean 
         \begin{verbatim}
             Assuming the limits as part of arrays 'a' and 'c'
+            //similarly with the pairs (a,b) and (b,c)
             Case-1: 
                 min = a[1]
                 max = c[n]
@@ -276,8 +305,10 @@
             M3 = max(tempM3(a,b), tempM3(b,c), tempM3(c,a))
         \end{verbatim}
         \item $M_4$ = min \{$W_2(i,j,k)$\} : 
+        
+        To find the two closest points(belonging to different arrays) in the set \{[a[1..n], b[1..n], c[1..n]\}, irrespective of the third point
         \begin{verbatim}
-            i=2, j=2, k=2
+            i=1, j=1, k=1
             while(i,j,k <= n){
                 W2 = min(|a[i]-b[j]|, |b[j]-c[k]|, |c[k]-a[i]|)
                 minW2 = min(minW2, W2)
@@ -288,29 +319,34 @@
             }
             M4 = minW2
         \end{verbatim}
-        Initial conditions ; \{(i=j=k=2)$\cup$($W_2$ = min($|$a[1]-b[1]$|$, $|$b[1]-c[1]$|$, $|$c[1]-a[1]$|$))\}
+        Initial conditions ; \{(i=j=k=1) $\cap$ (minW2 = W2[1,1,1])\}
         
-        Loop invariants : \{(i,j,k $\leq$ n)$\cup$($minW_2$ $\epsilon$ \{$W_2$[i,j,k]\})\}
+        Loop invariants : \{M4 = min(minW2, min(W2[i..n,j..n,k..n]))\}
         
-        Final conditions ; \{($minW_2$ = min($W_2[i,j,k]$))\}
+        Final conditions ; \{(M4 = min(W2[1..n,1..n,1..n])) $\cap$ (max(i,j,k) = n+1)\}
+        
+        Correctness of the algorithm : 
+        
+        First lets prove loop invariant.
+        Initially(M2 = min(minW2,W2[1..n,1..n,1..n],since minw2 is initialized as infinity, W2[1..n,1..n,1..n] is definition of M2.
+        Now assume its true for l iterations.Using this lets prove it for l+1 iteration,in l+1th iteration we consider all triplets which contain minimum element among remaining elements, among these triplets, the triplet whose elements are minimum elements of each array (i..n,j..n,k..n) is the triplet with best possible answer.This can be proved easily.
+        Since all triplets that contain elements less than l+1th smallest element are already considered,now considering this triplet,minW2 also contains minimum of all the triplets that contain l+1th element too.Hence by induction the statement is true.
+        \\The terminating condition of the loop is max(i,j,k) = n+1. At terminating condition, the loop invariant will be M4 = min(minW2, min(W2[i..n,j..n,k..n]), but the second term doesn't exist. Therefore, M4 = minW2
     \end{enumerate}
     \item
-    The common element can be found by incrementing the smallest of the set(a[i], b[j], c[k]) one by one, until all three are equal. 4 comparisons will be needed for each increament, to check if the values are equal, otherwise to find the minimum. Thus, in the worst case scenario, in which the common element is the last element in each array, the total number of comparisons will be :
-    \[ \sum_{i=1}^{p}4 +  \sum_{j=1}^{q}4 + \sum_{k=1}^{r}4\]
+    The common element can be found by incriminating the smallest of the set(a[i], b[j], c[k]) one by one, until all three are equal. 2 comparisons will be needed for each increment to find the minimum. Thus, in the worst case scenario, in which the common element is the last element in each array, the total number of comparisons will be :
+    \[ \sum_{i=1}^{p}2 +  \sum_{j=1}^{q}2 + \sum_{k=1}^{r}2\]
     Therefore, the time complexity of the program will be of O(p+q+r)
     
     \textbf{Pseudo-code :}
     \begin{verbatim}
-        while((i <= p) && (j <= q) && (k <= r)){
-            if((a[i] == b[j]) && (b[j] == c[k])){
-                return (a[i],i,j,k)
-            }else{
-                temp = min(a[i],b[j],c[k])
-                if(temp == a[i]) i++
-                if(temp == b[j]) j++
-                if(temp == c[k]) k++
-            }
+        while((i != j) || (j != k)){
+            temp = min(a[i],b[j],c[k])
+            if(temp == a[i]) i++
+            if(temp == b[j]) j++
+            if(temp == c[k]) k++
         }
+        return (a[i],i,j,k)
     \end{verbatim}
     
     \textbf{EXTRA-1} : 
@@ -333,15 +369,19 @@
             }
             if(j == n+1){           //every row contains a[1][i]
                 position[1] = i
-                return (position)
+                return (a[1][position[1]],position)
             }
         }
     \end{verbatim}
-    Initial conditions : \{i=1,k=1,j=2\}
+    Initial conditions : \{(i=1) $\cap$ (k=1) $\cap$ (j=2) $\cap$ (position[1..n] = 0)\}
     
-    Loop invariants : \{(i,k$\leq$m) $\cup$ (j$\leq$n) $\cup$ (position[a] $\epsilon$ [0,m])\}
+    Loop invariants : \{(i$\leq$m) $\cap$ (k$\leq$m+1) $\cap$ (j$\leq$n+1) $\cap$ (position[a] $\epsilon$ [0,m])\}
     
-    Final conditions ; \{position[a] $\epsilon$ [1,m]\}
+    Final conditions ; \{(position[a] $\epsilon$ [1,m]) $\cap$ (j = n+1)\}
+    
+    \underline{Proof of correctness} :
+    
+    The loop invariant is valid before the loop initiates. While checking each element in the first row, position[j] might get updated to k, if the kth element of the jth row is equal to the ith element in the first row, but we know that the inner loop terminates when k = m+1. Thus the maximum value position[j] can get is m. Since we know there is a common element, position[j] need not be reset every time 'i' is incremented. When the main loop terminates, j = n+1, (\textit{i.e}) every n values of position has been updated in this loop. Therefore, position[i] will contain the position of the common element in the ith row.  
     
     A more efficient algorithm can be achieved by using an incremental procedure. We compare the least elements in each row. If they are equal, then return the positions and the value. Else, increment all rows except the row with the highest minimum value. Since there exists a common element, continue this until all the minimum elements are equal.The time complexity will be: 
     \[\sum_{i=1}^{m}2*(n-1) = 2m(n-1)\]
@@ -354,20 +394,90 @@
             for(i=1;i<n;i++){
                 if(a[i][indices[i]] != a[i+1][indices[i+1]]) break
             }
-            if(i == n) break
-            for(i=1;i<=n;i++){
+            if(i == n) break    //found the common element
+            maxTemp = a[1][indices[1]]
+            for(i=2;i<=n;i++){
                 if(maxTemp < a[i][indices[i]]){
                     maxTemp = a[i][indices[i]]
-                    maxIndex = i
                 }
             }
-            for(v in [1,n]-{i}){
-                indices[v]++
+            //for all rows except those containing maxTemp
+            for(i=1;i<=n;i++){
+                if(a[i][indices[i]] != maxTemp) indices[i] ++
             }
         }
         return (a[i][indices[i]], indices)
     \end{verbatim}
-    Initial conditions : 
+    Initial conditions : \{indices[1..n] = 1\}
+    
+    Loop invariant : \{(indices[1..n] $\leq$ m) $\cap$ (maxTemp $\leq$ x)\}
+    
+    Final conditions : \{(a[i][indices[i]] = x $\forall$ i $\epsilon$ [1,n]) $\cap$ (maxTemp = x)\}
+    
+    \underline{Proof of correctness} :
+    
+    We know that a common element, x exists. A terminating condition for the loop is for maxTemp to be equal to x. If the current element of a row is x, then the the indices of all other rows will be increased till the point the element in each row is x, since all the rows contain x and thus, the new value of the row element can't be greater than x, without the row element reaching x. Since the maxTemp is also x, the index of this row won't be incremented. We can prove that the current element of some row will be x at some point. Assume that x hasn't appeared in any row yet. Thus maxTemp is less than x, so if some row does reach x, it's index will not be incremented the next iteration. We can also say that x will not be skipped in a row, since maxTemp is less than or equal to x, and for x to be skipped, maxTemp should be greater than x. So, if x hasn't appeared in one row, it hasn't been skipped in any other row. Since x is present in all rows, the index of a row can't cross m+1 without reaching x, and since maxTemp won't be larger than x till the point some row reaches x, the current element of a row will be x at one point of time.
+    
+    \textbf{EXTRA-2}: 
+    
+    For the naive algorithm of $O(nm^2)$, the only additional condition will be if i=m+1, the there will be no common element.
+    
+    \textbf{Pseudo-code :}
+    \begin{verbatim}
+        i=1,j=2;k=1
+        position[1....n] = 0
+        for(i=1;i<=m;i++){
+            for(j=2;j<=n;j++){
+                for(k=1;k<=m;k++){
+                    if(a[1][i] == a[j][k]){
+                        position[j] = k
+                        break
+                    }
+                }
+                if(k == m+1) break  //a[1][i] isn't present in row j
+            }
+            if(j == n+1){           //every row contains a[1][i]
+                position[1] = i
+                return (a[1][position[1]], position)
+            }
+        }
+        return (-1) // since there in no common element
+    \end{verbatim}
+     Initial conditions : \{(i=1) $\cap$ (k=1) $\cap$ (j=2) $\cap$ (position[1..n] = 0)\}
+    
+    Loop invariants : \{(i$\leq$m+1) $\cap$ (k$\leq$m+1) $\cap$ (j$\leq$n+1) $\cap$ (position[a] $\epsilon$ [0,m])\}
+    
+    Final conditions ; \{((position[a] $\epsilon$ [1,m]) $\cap$ (j = n+1)) $\cup$ (i = m+1)\}    
+    
+    For the incremental algorithm of $O(nm)$
+    
+    \textbf{Pseudo-code :}
+    \begin{verbatim}
+        indices[1...n] = 1
+        while(max(indices[...] <= m){
+            for(i=1;i<n;i++){
+                if(a[i][indices[i]] != a[i+1][indices[i+1]]) break
+            }
+            if(i == n) break    //found the common element
+            maxTemp = a[1][indices[1]]
+            for(i=2;i<=n;i++){
+                if(maxTemp < a[i][indices[i]]){
+                    maxTemp = a[i][indices[i]]
+                }
+            }
+            //for all rows except those containing maxTemp
+            for(i=1;i<=n;i++){
+                if(a[i][indices[i]] != maxTemp) indices[i] ++
+            }
+        }
+        if(i == n) return (a[i][indices[i]], indices)
+        else return(-1)
+    \end{verbatim}
+    Initial conditions : \{indices[1..n] = 1\}
+    
+    Loop invariant : \{(indices[1..n] $\leq$ m+1)\}
+    
+    Final conditions : \{(a[i][indices[i]] = a[i+1][indices[i+1]] $\forall$ i $\epsilon$ [1,n-1]) $\cup$ (max[indices[1..n] = m+1)\}
     \item[8.]
     \begin{enumerate}
         \item Let $S_i(x) = \prod_{i\neq j,1 \leq j \leq n} \frac{x-x_j}{x_i-x_j}$
@@ -420,6 +530,18 @@ So each $G_j(x)$ takes c*j steps. So to calculate $G_n(x)$ we do c*1 + c*2 +....
     The order of computation would be finding $D_j(x)$ first then $D_j'(x)$ and then $G_j(x)$ and finally $G_j'(x)$ in a single loop run.
     Now computing all these at jth point is again linear in j(similar to 8). so again the total number of steps is c*1 + c*2 + ...c*n = c*n(n+1)/2 which is again $O(n^2)$
     \item[9.]
+    Let G(n) be minimum number of calls they have to make so that all n people receive every information.The best bound on G(n) we could find is $G(n) \leq 2n - 4, \forall n \geq 4$.
+    \\Proof:
+    Lets prove it by induction,
+    \\Base case:
+    For n = 4, and let people be named a,b,c,d.Now the following is solution in 4 steps:
+    a calls b, c calls d , a calls c ,b calls d.
+    We can see that in these 4 calls every information is reached to all.
+    \\Now assume for $k \geq 4$ assume that $G(k) \leq 2k - 4$, (Inductive Hypothesis) , lets prove its true for k+1 using k.
+    \\Consider sequence of calls corresponding to solution G(k), Now to these sequence of calls, add
+    $(k+1)^{th}$ guy calling some other guy from k people (say a) as the first call.Now since a's information is transferred to all other k-1 people so will be k+1's information.Now add a call again from a random person of k people to k+1 to the end of sequence.Since after all calls every one of k people have all the information,making this call will make k+1 also know all information.\\So, $G(k+1) \leq 2k-4+1+2$(since there exists a solution using k for k + 1 ,G(k+1) must be less than or equal to this).
+    \\$G(k+1) \leq 2k-2$.\\$G(k+1) \leq 2(k+1) -4$.
+    So by Induction,It is true $\forall k \geq 4$.
 \end{enumerate}
 \begin{enumerate}
     \item[22.4-2/32.3.] The number of paths from one node to another in a DAG can be found in linear time, \textit{(i.e)} in O(n+m), using the dfs algorithm. We maintain two arrays of size n, storing the number of paths from that node to the destination node, and another , stating whether the node has already been visited in the dfs traversal. Here, a node is said to be visited, if the dfs call of that node has initiated or had completed.
@@ -429,7 +551,7 @@ So each $G_j(x)$ takes c*j steps. So to calculate $G_n(x)$ we do c*1 + c*2 +....
         int NumPaths(vertex start, vertex end, int* numPaths, bool* isVisited){
             int sum = 0
             isVisited[start] = true
-            for(v in adjacencyMatrix[start]){
+            for(v in adjacencyList[start]){
                 if(v == end) sum++
                 else if(isVisited[v] == true) sum += numPaths[v]
                 else sum += NumPaths(v, end, numPaths, isVisited)
@@ -462,8 +584,80 @@ So each $G_j(x)$ takes c*j steps. So to calculate $G_n(x)$ we do c*1 + c*2 +....
     
     \textbf{Time complexity :-}
     
-    The topological sorting of the vertices take O(V+E) time since it performs a DFS. After the topological sorting, for checking if there is an edge between every adjacent vertex takes O(V) time.
+    If the graph is represented using adjacency list, the topological sorting of the vertices take O(V+E) time since it performs a DFS. After the topological sorting, for checking if there is an edge between every adjacent vertex takes O(V+E) time. The overall time is O(V+E)
+    
+    If the graph is represented using matrix then topological sort would take O($V^2$) and checking the edge between adjacent vertex would take O(V). But the overall time complexity is O($V^2$), which is not linear. 
+    
+    Hence, adjacency list representation must be used. 
     
     So the overall time = O(V+E)
+    \item[3.25.]
+    \begin{enumerate}
+        \item 
+        For a Directed acyclic graph, we find topological sort using DFS which takes O(V+E).In topological sort, for a given vertex, all vertices reachable by it are to the right of it.
+        So, we process vertices in reverse topological order, and for every vertex(u) we find minimum of cost[v] for all adjacent vertices v to the current vertex(u)(including current vertex's price) and assign cost[u] this minimum value.Since we are doing it in reverse topological order cost[v] would have already been calculated.
+       \\ \textbf{Pseudo code :}
+        \begin{verbatim}
+            void findCost(int x)
+            {
+                cost[x] = price[x];
+                for(int &i:adjList[x])
+                {
+                    cost[x] = min(cost[x],cost[i]);
+                }
+            }
+            int main()
+            {
+                for(int i = n-1; i >= 0; i--)
+                {
+                    findCost(topoSort[i]);
+                }
+            }
+        \end{verbatim}
+        \textbf{Time Complexity:}
+        Time complexity of this is O(V+E), Finding topological sort takes O(V+E) time and finding cost also takes O(V+E) time(because \emph{findCost} is called V times and total number of times minimum function is called is E).So overall time complexity is O(V+E).
+        \item
+        The two-tiered structure of directed graph is that every directed graph can be represented as Directed Acyclic graph with Strongly Connected Components(SCC) as its vertices.
+        Now, this is useful because in our case, for a SCC all vertices in it have same cost which is minimum of price of each vertex in SCC(because every vertex is reachable by every other vertex in it). And across SCCs' the cost behaves similar to DAG.
+        The algorithm for general directed graph goes as follows:\\
+        1)Find strongly connected components in the graph using Kosaraju's algorithm in linear time(O(V+E)).\\
+        2)Create a new graph G' whose vertices are SCC's of our original graph(G).\\
+        3)The price of a vertex in this graph is minimum of prices of all vertices in original graph that belong to this SCC.\\
+        4)Now edges of G' is all edges of G, such that ends of that edge in G is corresponding SCC in G',Remove self loops,i.e ignore edges among vertices in same SCC.This may create parallel edges but they wont be a problem.\\
+        5)Find Cost array of G' using algorithm in part (a) since its a DAG.\\
+        6)Now cost array of original graph is calculated using this cost array where for each vertex, its cost is equal to the cost of SCC it belongs to.\\
+        This whole algorithm can be implemented as follows:
+        After step 1, for each SCC assign an index to represent it in G' and store an array of length |V| named SCC where SCC[u] contains index of SCC the vertex u belongs to.
+        Also create a price array(say price1) of length = number of SCCs.Initialize them with $\infty$ and do the following to assign their prices.
+        \begin{verbatim}
+            for(int i = 0; i < n; i++)
+            {
+                int x = SCC[i];
+                price1[x] = min(price1[x],price[i]);
+            }
+        \end{verbatim}
+        Now coming to edges,edges of G' can be created as follows:
+        \begin{verbatim}
+            for(int i = 0; i < n; i++)
+            {
+                for(int &x:adjList[i])
+                {  if(SCC[i]!=SCC[x])
+                    adjList1[SCC[i]].insert_at_end(SCC[x]);
+                }
+            }
+        \end{verbatim}
+        Now we get Adjacency list of G' in adjList1.Now that we have adjList1,price1, we can get cost1 ,cost array of G' using algortithm from part a.\\
+        Now cost array of original can be retrieved as
+        \begin{verbatim}
+        for(int i = 0; i < n; i++)
+        {
+            cost[i] = cost1[SCC[i]];
+        }
+        \end{verbatim}
+        \textbf{Time Complexity:}
+        Step 1 takes O(V+E),creating price array takes O(V),creating adjacency list for G' takes O(V+E),now number of vertices in G' is bounded V and edges also bounded by E,so finding cost1 takes O(V+E), from cost1 finding cost array takes O(V).\\
+        So overall complexity is O(V+E).
+        
+    \end{enumerate}
 \end{enumerate}
 \end{document}
