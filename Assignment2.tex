@@ -2,6 +2,8 @@
 \usepackage[utf8]{inputenc}
 \usepackage{latexsym}
 \usepackage{amsmath}
+\usepackage{amssymb}
+\newcommand{\Mod}[1]{\ (\mathrm{mod}\ #1)}
 \usepackage{amsfonts}
 \usepackage{mathtools}
 \DeclarePairedDelimiter{\ceil}{\lceil}{\rceil}
@@ -24,28 +26,762 @@
 \newpage
 \begin{enumerate}
     \item %1 
+    \begin{enumerate}
+        \item
+        Let the GCD(a,b) be d. Therefore, d will be the smallest integer greater than 0, such that it can be represented in the form of ax + by, where x,y $\in$ $\mathbb{Z}$ (consequence of Bezout's identity on Linear Combinations). Let the values of x and y for which ax+by = d, be $x_0$ and $y_0$
+        \begin{align*}
+            min(ax+by) &= d \\
+            \Rightarrow ax_0 + by_0 &= d\\
+            GCD(a/2, b/2) &= min((a/2)x + (b/2)y) \\
+            &= min(ax + by)/2 \\
+            &= (ax_0 + by_0)/2 \\
+            &= d/2 \\
+            \therefore GCD(a/2,b/2) &= GCD(a,b)/2 
+    \end{align*}
+        \item
+        GCD of an odd number and an even number should be odd. Let us assume b is even. Therefore, when we write d(the GCD) in the form of ax + by, x will have to be odd and y can have any parity, since "by" will be even irrespective of the parity of y, and to get the sum as an odd number, the two numbers (ax,by) must have opposite parities. So x must be odd. Similar to (a), let the values of x and y, when d = ax + by, be $x_0$ and $y_0$
+        \begin{align*}
+            min(ax+by) &= d\\
+            \Rightarrow ax_0 + by_0 &= d\\
+            \Rightarrow ax_0 + (b/2)(2*y_0) &= d\\
+            \Rightarrow ax_0 + (b/2)y_1 &= d\\
+            \therefore GCD(a,b/2) &= d
+        \end{align*}
+        \item
+        Since a and b are odd, a-b will be even. Thus, we can use the Euclidean properties of GCD and the result from (b) 
+        \begin{align*}
+            GCD(a,b) &= GCD(a-b,b) \\
+            GCD(a-b,b) &= GCD((a-b)/2,b) \qquad  -(b)\\
+            \Rightarrow GCD(a,b) &= GCD((a-b)/2,b)
+        \end{align*}
+        \item
+        Using the above 3 properties, we can design an algorithm that is of $O(log a + logb)$, but since we are considering b to be less than a, loga + logb $<$ 2*loga. Thus the time complexity will be $O(loga)$ 
+        
+        \textbf{Pseudo-code} :
+        \begin{verbatim}
+            GCD(a, b){
+                if(a < b){
+                    swap(a,b)
+                }
+                if(b != 1){
+                    if(a%2 == 0 and b%2 == 0) return GCD(a/2, b/2)
+                    else if(a%2 == 0) return GCD(a/2.b)
+                    else if(b%2 == 0) return GCD(a.b/2)
+                    else return GCD(a-b/2, b)
+                }else{
+                    return a
+                }
+            }    
+        \end{verbatim}
+    \end{enumerate}
     \item 
+    a) 
+    
+    No. of bits to represent a = $ \lceil {loga} \rceil $,
+    No. of bits to represent b = $ \lceil {logb} \rceil $
+    
+    The algorithm is as follows:
+    
+    Take the first logb bits in a, compare the first logb bits in a and the number b. 
+    
+    If b $\geq$ number represented by first logb bits in a then take the next bit in a and now subtract. If there is no bit left then that is the remainder
+    
+    If b $<$ number represented by first logb bits in a then subract b from that.
+    
+    Follow the above steps until last logb bits in a.
+    
+    Therefore the total number of comparisions and subtractions = $ \lceil {loga} \rceil $ - $ \lceil {logb} \rceil $ + 1 = $ \lceil {logq} \rceil + 1$
+    
+    Length of each subtraction or comparision = $ \lceil {logb} \rceil $
+    
+    Hence, this method requires O($ ( {logq} + 1) {logb} $)
+    
+    b) gcd(a,b) to gcd(b,a$\Mod b$) requires division of a by b.
+    
+    r = a$\Mod b$
+
+    \begin{equation}
+        \begin{split}
+            \Rightarrow \mu(a,b) - \mu(b,a\Mod b) & = \mu(a,b) - \mu(b,r) \\
+            & = (1+loga)(1+logb) - (1+logb)(1+logr) \\
+            & = (1+logb)(loga-logr) \\
+            & \geq (1+logb)(loga-logb+1) \quad \quad \quad (logb \geq logr+1) \\
+            & = (1+logb)(logq+1) \\
+            & \geq (1+logq)logb
+        \end{split}
+    \end{equation}
+    
+    c) It is shown in part b) that the number of bit operations in Euclid(a,b) to reduce the problem of computing gcd(a, b) to gcd(b, amod b) is at most $\mu$(a,b) - $\mu$(b,amod b)
+    
+    $r_0$ = amod b
+    
+    No. of computations from gcd(a,b) to gcd(b,$r_0$) = $\mu$(a,b) - $\mu$(b,$r_0$)
+    
+    $r_1$ = bmod $r_1$
+    
+    No. of computations from gcd(b,$r_0$) to gcd($r_0$,$r_1$) = $\mu$(b,$r_0$) - $\mu$($r_0$,$r_1$)
+    
+    Similarly continuing in this way we get till the base case gcd(c,0),
+    
+    Total no. of steps = $\mu$(a,b) - $\mu$(b,$r_0$) + $\mu$(b,$r_0$) - $\mu$($r_0$,$r_1$) + ...... - $\mu(c,0)$
+    
+    We can see that this is order of $\mu(a,b)$, So the number of bit operations for computing Euclid(a,b) is $O(\mu(a,b))$.
+    
+    Now if the 2 numbers a and b are of $\beta$ bits then,
+    
+    \[ O(\mu(a,b)) = O((1+loga)(1+logb)) = O((1+\beta)(1+\beta)) = O(\beta^2) \]
+    
+    d) Suppose this algorithm takes k steps, then
+    
+    $b \geq f(k+1) = \phi^{k+1}/ \sqrt{5} $
+    
+    $ \sqrt{5}b \geq \phi^{k+1} $
+    
+    $ k+1 < \log_\phi b + \log_\phi\sqrt{5} $
+    
+    $ k < 0.67 + \log_\phi b < 1 + \log_\phi b $
+    
+    Hence, Euclid(a,b) takes atmost 1 + $\log_\phi b$ recursive calls.
+    
+    We can say that calculation of gcd(k.a,k.b) and gcd(a,b) take the same amount of time because at every step the arguments of function computing gcd in the both cases are proportional with the factor k. The algorithm for the gcd(k.a,k.b) stops at k.gcd(a,b).
+    
+    Let c = $\frac{a}{gcd(a,b)}$ and d = $\frac{b}{gcd(a,b)}$. Since the no. of steps for computing gcd(a,b) is the same as computing gcd(c,d).
+    
+    Hence the reduced bound is (1 + $\log_\phi d$) = 1 + $log_\phi b/gcd(a,b)$
+    
     \item 
-    \item
+    Since the array is unimodal, the difference array contains positive integers first and then negative integers, and the place where positive changes to negative is the maximum value.
+    So binary search can be done on difference array to find the maximum element.
+    For completion purpose , Assume A[0] = $-\infty$ and A[n+1] = $-\infty$.
+    The following pseudo code can be used to find the maximum element in array.
+    \begin{verbatim}
+    int low = 1,high = n;
+    while(low < high)
+    {
+        int mid = ((low + high) >> 1);
+        if(A[mid+1] - A[mid] > 0 )
+        {
+            low = mid+1;
+        }
+        else
+        {
+            high = mid;
+        }
+    }
+    cout << A[low] <<"\n"; 
+    \end{verbatim}
+    \item A node v will be the local minimum if $x_v$ is less than $x_p$, $x_{c1}$ and $x_{c2}$ where p represents it's parent, c1 and c2 represent it's children. To find a local minimum, we traverse from the root, through it's children till we either find a local minimum or we reach a leaf, which will turn out to a local minimum, if reached. During the traversal, we probe both children of the node being traversed(v). If both $x_{c1}$ and $x_{c2}$ are greater than $x_v$, then the node v will be a local minimum. Else, if atleast one of $x_{c1}$ or $x_{c2}$ is greater than $x_v$, then we continue the traversal through the child with the lower label. Now if we arrive at the penultimate level of the tree,\textit{(i.e)} the level in which the children of the nodes are leaves, it means that the $x_p$ is greater than $x_v$. If either of it's children have a lower label, then that child will be a local minimum, since the only connection is with it's parent. If both children have larger labels, then the current node will be local minimum. Thus the traversal will end when a leaf is found, and with each iteration, a new level of the tree is probed. Thus the time complexity will be of $O(d)$ where d is the number of levels, which is equivalent to $O(logn)$
+    
+    \textbf{Pseudo-code} : 
+    \begin{verbatim}
+    node = root 
+    while(node->children != NULL){
+        if(label[node]<label[child1] and label[node]<label[child2]){         
+            return(node)
+        }else if(label[child1] < label[node]){
+            node = child1
+        }else{
+            node = child2
+        }
+    }
+    return(node)    //returns a leaf if no ancestor is a local minimum
+    \end{verbatim}
     \item %5
+    The O($n$) algorithm for a local minimum in the n*n grid is:
+    
+    Traverse through all elements of the middle column. Find the minimum index in the column and look at the horizontal neighbours.
+    
+    If it is less than both the horizontal neighbours, local minimum is found
+    
+    Else find the minimum of the horizontal neighbours(store it in localMin) and apply recursion on the half matrix which contains the smaller one. Now apply the same method on middle row of $n*\frac{n}{2}$ grid. The minimum computed in this row is compared with the other adjacent elements, if less than both local minimum is found, else we take the minimum of the adjacent elements(store it in currMin).
+    
+    Now, 
+    
+    \begin{verbatim}
+        if(currMin<localMin) 
+            localMin = currMin
+        recursion() // on the half containing localMin
+    \end{verbatim}  
+                    
+    
+    2 functions are needed, one to apply the above process traversing through the middle row and the other traversing through middle column.
+    
+    The idea for the above algorithm came from the steepest descent algorithm. We can say this algorithm is correct because moving downhill should eventually terminate.
+    
+    \underline{Time complexity :}
+    
+    Each time it traverses through a row/column and 2 comparisons are made with the other adjacent elements and 1 more with localMin and currMin.
+    
+    \[ T(n) = n + 2 + n/2 + 3 + n/2 + 3 + n/4 + 3 + n/4 + 3 + ....... \]
+    
+    \[ \Rightarrow T(n) = (n+2) + 2*(n + 3logn) \]
+    
+    \[ \Rightarrow T(n) = 3n + 6logn + 2 = O(n) \]
+    
+    
     \item
+    \begin{enumerate}
+        \item 
+        We can use a hash map and store frequencies of each element in hash map.And after calculating all frequencies, if any frequency is strictly greater than n/2, then it becomes majority element otherwise no majority element.
+        Average case time complexity is O(n) , but worst case can be $O(n^2$)
+        \item
+        For an algorithm using only == comparisons between two elements, we first iterate from left to right and check if majority element exists what could it be.
+        In the second loop we check if it is really a majority element by finding frequency and checking if it is greater than n/2.
+        The pseudo code is the following:
+        \begin{verbatim}
+            int possMajElement = A[0],majIndex = 0;
+            int count = 1;
+            for(int i = 1; i < n; i++)
+            {
+                if(A[i] == possMajElement) count ++;
+                else
+                {
+                    count--;
+                    if(count==0)
+                    {
+                        possMajElement = A[i];
+                        majIndex = i;
+                        count = 1;
+                    }
+                }
+            }
+            int freq = 0;
+            for(int i = 0; i < n; i++)
+            {
+                if(A[i] == possMajElement)
+                {
+                    freq++;
+                }
+            }
+            if(freq > n/2)
+            {
+                cout << "majority element exists and is equal to " 
+                << possMajElement << "\n";
+            }
+            else
+            {
+                cout << "No majority element\n";
+            }
+        \end{verbatim}
+        proof that first loop finds majority element if it exists:
+        If there is a majority element, total number of times counter increases is atleast equal to its frequency because whenever new element is found the count increases or whenever same element is found count increases, so definitely count will be positive and contains majority element at the end.
+        Reference : Boyre - Moore's Majority vote algorithm,Wikipedia
+    \end{enumerate}
+    \item Assume the singleton sets to be nodes of a directed graph, where the edges represent $f(node)$. For a set R to have $f(R)$ = R, the image of each node of R must have a unique value, which is present in R, \textit{(i.e)} R is a set of nodes, that form cyclic components in the graph of S. Since there is only one edge from a node(multiple edges can point to the same node), we can find the number of cycles in the graph using DFS. During DFS traversal, if a node is reached, which has already been visited, but not included into the set R, then a cycle will be present.
+    
+    \textbf{Pseudo-code} :
+    \begin{verbatim}
+    DFS(S, R, isVisited, v){
+        if((isVisited[v] == true) and (v is not present in R)){
+            R.add(v)
+            tempNode = v->next
+            while(tempNode != v){
+                R.add(tempNode)
+                tempNode = tempNode->next
+            }
+        }else if(isVisited[v] == false){
+            isVisited[v] = true;
+            DFS(S, R, isVisited, v->next)
+        }
+    }
+    
+    main(){
+        for(v in S) DFS(S, R, isVisited, v)
+    }
+    \end{verbatim}
+    Time complexity will be of $O(n)$, since the sum of the number of times we traverse nodes that have already been visited during the DFS will be atmost n, since the sum will be the number of nodes that form cycles in S. The number of times we traverse unvisited nodes are n. Thus, the maximum number of traversals in the algorithm is 2n.
     \item
+    a) m=1
+    
+    This is an array of n numbers. We have to find a local maximum(greater than all the neighbours). We know that there is only one neighbour for the end elements array[1] and array[n]. So we take array[0]=array[n+1]=INTMIN. So we know that there exists atleast one local maximum in array[1..n] (Since the slope is going from positive to negative). So the algorithm is to take the portion which is increasing initially and decreasing in the end.
+    
+    The algorithm is:
+    
+    Initial conditions : start=1,end=n,array[0]=array[n+1]=INTMIN
+    
+    1) Take mid = (start+end)/2, now compare array[mid] with its neighbour array[mid+1].
+    
+    2) If array[mid]$>$array[mid+1], there is a maximum in the left half array[start..mid]. So end=mid
+    
+    Else there is a maximum in the right half array[mid+1..end]. So start=mid+1
+    
+    3) \textbf{If} start $\neq$ end then repeat from 1 ,\textbf{Else} return start
+    
+    The number of times the above steps are repeated = $\lceil logn \rceil$
+    
+    No. of boxes opened in each step = 2 (mid,mid+1)
+    
+    Total number of boxes opened in the worst case = $2\lceil logn \rceil$
+    
+    b) n=m
+    
+    This problem is similar to problem 5 instead we have to find the local maximum. Refer to the solution for 5.
+    
+    c) No. of boxes to be opened = n + 2 + (n/2+2) + (n/2+2) + .....
+    
+    \[ = (n+2) + 2*(n+2logn) \]
+    \[ = 3n + 4logn + 2\]
+    
+    We know that n$>$logn,
+    
+    \[ \Rightarrow 3n + 4logn + 2 < 7n \]
+    
+    This algorithm is optimal upto 7n.    
     \item
-    \item
+    We can use divide and conquer approach to find kth integer in logN time. k can be in either of the 4 portions of the two arrays:
+    \begin{enumerate}
+        \item[(i)] Less than mid of A and mid of B
+        \item[(ii)] Less than mid of A and greater than mid of B
+        \item[(iii)] Greater than mid of A and lesser than mid of B
+        \item[(iv)] Greater than mid of A and mid of B
+    \end{enumerate}
+    For each case, we can call a recursive function, with modified versions of the arrays A and B, along with a modification in k, if necessary. They are as follows:
+    
+    Note: here n represents the end of the array and not the original size of array.
+    \begin{enumerate}
+        \item[(i)] Since k is less than $mid_A$ and $mid_B$, all elements greater than $mid_A$ and $mid_B$ can be removed, from their respective arrays,$(i.e)$ replace A[1..n] and B[1..n] with A[1..$mid_A$] and B[1..$mid_B$]
+        \item[(ii)] All elements greater than $mid_A$ and all elements less than $mid_B$ can be removed $(i.e)$ modify arrays into A[1..$mid_A$] and B[$mid_B$..n], and decrement k by size(B)/2, since size(B)/2 elements less than k have been removed. 
+        \item[(iii)] Modify the arrays into A[$mid_A$..n] and B[1..$mid_B$], and decrement k by size(A)/2.
+        \item[(iv)] Modify the arrays into A[$mid_A$..n] and B[$mid_B$..n], and decrement k by size(A)/2 + size(B)/2
+    \end{enumerate}
+    We continue this until one array had been exhausted, and then continue with the other array, until the kth element is found.
+    \begin{enumerate}
+        \item In this case, we continue to prune the arrays from the beginning of the arrays only, and not involving the ends of the arrays. We compare the (k/3)th element of each array and find the minimum of them. We take k/3 so as to ensure that it is a valid index for the arrays. All elements in the respective array less than the minimum will be less than the kth element. So we can prune them and decerement k to 2k/3, $(i.e)$ if A[k/3] is the least of the 3, then A[1..k/3] will be pruned. This is continued until k is now equal to 1. Thus the number of times the function is called is $\log_{2/3} k$, and so, the time complexity will be O(logk).
+        \item We start the recursive function by selecting the largest row of the smallest index. We use the median of this row as a pivot to prune the rows. We can find the indices of largest element less than the pivot, for each row, using binary search, which will take time O(logn) for each row. If the sum of all indices is more than k, then remove all elements less than the index value we found earlier, for each row. Else if the sum is less, then remove all elements greater than the value for each row. Continue this until the size of all arrays are 1 or less. Finally, use the remaining elements, of size atmost k, to find the kth element of the matrix, by using a simple selection algorithm. 
+        
+        The worst case time complexity will occur when only one row is being modified with with each iteration. But atleast half of the elements are removed, so it takes atmost logn iterations to reduce a row to size 1. Thus for the worst case, there will be atmost m*logn iterations, and each iteration is of the order m*logn, due to the binary search. Thus the overall complexity of the program will be $O(m^2(logn)^2)$ 
+    \end{enumerate}
     \item %10
+    For this problem, we can maintain the information about the largest complete sub-tree of a predecessor of a node, and the largest complete sub-tree that can be made with this node and it's sibling if any. The recursion follows a post order traversal of the tree. The time complexity will be of $O(n)$ since this is a recursive tree traversal, with each traversal containing at most 4 comparisions. 
+    
+    
+    \textbf{Pseudo-code} :
+    \begin{verbatim}
+        LCST(tree* node, tree* predNode, depth, predDepth){
+            if(node->children == NULL){
+                predNode = node
+                predDepth = 0
+                depth = 0
+            }else if(node->child == NULL){
+                LCST(node->nonEmptyChild, predNode1, depth1, predDepth1)
+                depth = 0
+                predDepth = predDepth1
+                predNode = predNode1
+            }else{
+                LCST(node->left, predNode1, depth1, predDepth1)
+                LCST(node->right, predNode2, depth2, predDepth2)
+                depth = min(depth1, depth2) + 1
+                if(predDepth1 > predDepth2){
+                    predNode = predNode1
+                    predDepth = predDepth1
+                }else{
+                    predNode = predNode2
+                    predDepth = predDepth2
+                }
+                if(depth > predDepth){
+                    predDepth = depth
+                    predNode = node
+                }
+            }
+        } 
+    \end{verbatim}
     \item
+    Algorithm similar to binary search can be used. As the array contains odd number of elements let us assume the number of elements n = 2k+1 . 
+    
+    The algorithm is as follows:
+    
+    1) Divide the array into 2 parts, the first part containing k numbers and the other part contains (k+1) numbers.
+    
+    2) If k is even, compare a[k] \& a[k+1]. If equal then the required element is in a[k+2..end] (since from a[start..(k+1)] all form pairs) else it is in a[start..k]
+    
+    If k is odd, compare a[k] \& a[k-1]. If equal then the required element is in a[(k+1)..end] (since from a[start..k] all form pairs) else it is in a[start..(k-1)]
+    
+    3) We do the same thing again on the part of array containing that number. If start == end then that is the required number.
+    
+    \begin{verbatim}
+        Pseudo code:
+        findNum(a[],start,end)
+            if(start==end) return a[start]
+            
+            k = (end + start)/2;
+            if(k %2 == 0) 
+                if(a[k] == a[k+1]) return findNum(a,start,k)
+                else return findNum(a,k+2,end)
+            else 
+                if(a[k-1]==a[k]) return findNum(a,k+1,end)
+                else return findNum(a,start,k-1)
+    \end{verbatim}
     \item
+    If there are n balls, minimum number of queries required to find the majority color is n-1 in the worst case.We take a ball as reference ball and ask each query by taking this ball as one ball in the pair and for the other ball we take other n-1 balls for n-1 queries.Now first we maintain two counts, frequency of each ball.Initializing one to 1 and other to 0. And based on same or different we change the counts. When one of the counts is strictly greater than n/2, we break. In the worst case n-1 queries have to be made.Worst case moves cant be better than this because in every move we dont get any new information if we query between two balls present in same component.By component we mean the components in a graph,whose vertices are ball numbers and whose edges are queries.Now In this graph If we ask a query between two balls in same components, we create a cycle, which means we get no additional information(because we can already find whether they are same balls or different).So we always make sure there is no cycle in this graph. But at the end we need the graph connected, So the graph has to be a tree, which means n-1 edges are needed.
     \item
+    The worse time complexity will be O(n), since we will have to check which group, the lighter one or the heavier one, is the genuine group, by comparing the total number of coins in the group. To group the similar coins together, we can either:
+        \begin{enumerate}
+            \item Use a simple iteration, comparing all the coins with the first coin, until the count of a group crosses n/2, where one group represents the set of coins of the same weight as that of the first coin, and the second group represents the group of coins with a different weight. Worst case scenario will have n-1 comparisons, when the last coin is a genuine one.
+            \item Use DSU to join two sets and finally check which category(lighter or heavier) has a larger number of elements. We initially start with both categories being empty sets. We compare the coins in pairs of two. If they are of different wights, we add them to the respective categories. If they are of the same weight, then we join the two singleton sets and put them aside, for the next iteration. We continue this until all coins have been joined into sets of two, or have been allocated in a category. Now we compare the coin sets. If they are of the same weight, then merge them, Else place them in the respective categories. If two sets have different sizes, we can simply compare any 1 of each set. For the worst case complexity, the number of comparisons will be:
+            \begin{align*}
+                T(n) &= n/2 + (n/2)/2 + ((n/2)/2)/2 + ....\\
+                T(n) &= \sum_{i=1}^{\lceil logn \rceil}n(\frac{1}{2^i}) \\
+                &= O(n)
+            \end{align*}
+        \end{enumerate}
     \item
+    \textbf{a) k $>$ logn}
+    
+    Algorithm:
+    
+    Initial condition start=1,end=n
+    
+    1) Drop the box from the mid floor. mid = (start+end)/2
+    
+    2) \textbf{If} the box breaks then the required floor lies in 1..mid-1 (end=mid-1) \textbf{else} the required floor lies in mid..n (start=mid)
+    
+    3) Repeat from 1 \textbf{If} start$<$end \textbf{else} return start
+    
+    In each step of the algorithm the range in which the required floor lies is becoming half, so the algorithm runs $\lceil logn \rceil$ times. In the last attempt the box is not broken since that is the required floor. The worst case is, the boxes are broken all the previous times, which is $\lceil logn \rceil$-1.
+    
+    \[ k>logn \geq \lceil logn \rceil -1 \]
+    
+    \textbf{b) k $<$ logn}
+    
+    Algorithm:
+    
+    1) Drop the box from the floors which are multiples of $2^{k-1}$. $1.2^{k-1}$, $2.2^{k-1}$, ....., $\lceil \frac{n}{2^{k-1}} \rceil.2^{k-1}$
+    
+    2) Stop when the box breaks for the first time. Let that be $i.2^{k-1}$ floor. So, we know that the required floor lies somewhere in between [$(i-1)2^{k-1}$.. $i2^{k-1}-1$]. Now we have $2^{k-1}$ floors to check and (k-1) boxes available. We have solved this in the previous part.(We need not check when only one floor is left like in the previous part so the last box throw is not needed).
+    
+    Maximum number of times a box is thrown in the $1st$ step = $\frac{n}{2^{k-1}}$
+    
+    Number of times boxes are thrown in $2nd$ step = $O(log(2^{k-1}))$ = $O(k)$ (previous result)
+    
+    The total number of throws = $O(k+\frac{n}{2^{k-1}})$
+    
+    \textbf{c) k=2}
+    
+    Algorithm:
+    
+    1) Drop the box from even floors starting from 2 \textit{(i.e)} 2,4,...,2.$\lceil n/2 \rceil$
+    
+    2) Stop when the box breaks for the first time. Let that floor be $2i$. So we know that the required floor is either $2i-2$ or $2i-1$. Drop the other box from $2i-1$ floor. \textbf{If} it breaks then required floor is $2i-2$ \textbf{else} it is $2i-1$
+    
+    Maximum number of time boxes are thrown in $1st$ step = $\lceil n/2 \rceil$
+    
+    Number of times box is thrown in the $2nd$ step = 1
+    
+    Total number of throws = $\lceil n/2 \rceil$ + 1 = $O(n)$
+        
     \item %15
+    The cops can use following strategy:\\
+    1)Let cop1 match thief's x coordinate and cop2 match thief's y coordinate and let us drive thief to one of the corners.This can be done in 2*n moves.This is because thief cannot run away from both cops in both directions, atleast one cop gets closer to thief in one direction.And even in the direction he is running away he can only run until the border of the grid.So He runs until border in both direction for atmost 2n moves and reaches a corner.\\
+    2)Now, cops and thief form 3 corners of a rectangle.\\
+    3)Since the moves are symmetric for water and mirror images, we can assume thief is at bottom right of rectangle.\\
+    4)Now if thief moves towards one of the cops(say A), then A should move towards the thief and other cop(say B) should move in direction of thief.Again they form 3 corners of rectangle with thief at bottom right corner.But only the problem reduces to shorter rectangle whose one side is 2 lesser. Thief cant move away from cop because he is in bottom right corner.So if he stays where he is,then cops can move closer to him and problem again reduces by 1 in each direction.\\
+    5)So in worst case they require n more moves to catch the Thief.\\
+    6)Total number of moves is atmost 2*n + n in this algo, which is 3*n.
     \item
+    If there are an odd number of beads, the position all nodes need to be moved to, is the median bead. The sum of the distances can be found by finding the median using the selection algorithm in $O(n)$, and adding up the difference in the distances between the beads and the median bead.
+    
+    If there are an even number of beads, then the position to which all nodes need to be moved will be anywhere between the middle two beads, including the positions of the first and second middle beads.
+    
+    \textbf{Pseudo-code} :
+    \begin{verbatim}
+        Partition(array, k){
+            if(array.size() <= 5) return (array[array.size()/2])
+            for(int i=0;i<=array.size()/5;i++){
+                sort(array + i*5, array + min((i*5 + 4), array.size()-1))
+                tempArray[i] = array[i*5 + 2]
+            }
+            return Partition(tempArray, k/10)
+        }
+        Selection(array, k){
+            pivot = Partition(array, k)
+            i=0, j=0
+            for(int i=0;i<array.size();i++){
+                if(array[i] < pivot){
+                    swap(array[i], array[j])
+                    j++
+                }
+            }
+            if(j == k) return(pivot)
+            swap(array[j], array[pivotPosition])
+            if(j > k) return Selection(array[0..j-1], k)
+            else return Selection(array[j+1..array.size()], k-j)
+        }
+        DistanceSum(array){
+            sum = 0
+            median = Selection(array, array.size()/2)
+            for(int i=0;i<array.size();i++){
+                sum += abs(median - array[i]);        
+            }
+            return (sum)
+        }
+    \end{verbatim}
+    \item The approach to this problems is by taking the cumulative sum from the left, taking the 0's as -1. Let the array of numbers be represented by array[ ] the cumulative array be represented by prefixsum[ ].
+    
+    This prefixsum array can computed in O($n$).
+    
+    \begin{verbatim}
+        prefixsum[0] = array[0]
+        if(array[0]==0) prefixsum[0] = -1
+        for(i=1 to n-1) 
+            if(array[i]==0) prefixsum[i] = prefixsum[i-1] - 1
+            else prefixsum[i] = prefixsum[i-1] + 1
+    \end{verbatim}
+    
+    Now there are 2 cases in which subarray can contain equal no. of 1's and 0's.
+    
+    1) If we encounter a prefixsum[i] = 0, this implies subarray array[0..i] contains equal number of 0's and 1's
+    
+    2) If we encounter a value which is already seen before \textit{(i.e)} if i$<$j and prefixsum[i] = prefixsum[j] then array[(i+1)..j] contains equal number of 0's and 1's. 
+    
+    Now the problem is to find i and j such that prefixsum[i] = prefixsum[j] and (j-i) maximum or max i such that prefixsum[i] = 0. The maximum of these 2 cases is our answer.
+    
+    Now, maintain an array map[ ] of size 2*n+1, every element is initialised to -1. Whenever we encounter a prefixsum $\neq$ 0 for the first time we store that index in the map[prefixsum + n].(Since the prefixsum lies in between -n and n every possibility of prefixsum is covered).
+    
+    We first find the maximum i such that prefixsum[i]=0
+    \begin{verbatim}
+        maxsize = 0
+        for(i=0 to n-1) 
+            if(prefixsum[i]==0) maxsize = i+1
+    \end{verbatim}
+    
+    Now we check i,j such that prefixsum[i] = prefixsum[j]
+    \begin{verbatim}
+        for(i=0 to n-1)
+            if(prefixsum[i]!=0)
+                index = map[prefixsum[i]+n]
+                if(index!=-1) maxsize = max(maxsize,i - index)
+                else map[prefixsum[i]+n] = i
+        
+        return maxsize
+    \end{verbatim}
+    
+    Since this is just a couple of iterations the time complexity is O($n$) and an extra space is required for the map which is O($n$)
+    
     \item
+    \begin{enumerate}
+        \item
+        (In question it should be n/2 not n = 2)
+        Since there are more bad chips than good chips, we cannot find good chips because:
+        Assume k good chips are there , then we can always find k bad chips(since number of bad chips are more).Take these k bad chips, assume they behave same as k good chips,i.e:
+        1)They tell good chips as bad
+        2)They tell bad chips other than these k as bad.
+        This is symmetric to k good chips.
+        Now, assume we have all the information i.e nc2 (pairwise) informations. With all these informations we can tell that n-2*k chips as bad chips but among these 2k chips we cannot tell which k are good and which k are bad because n-2*k chips are bad we cannot use them to test and these k and k chips behave symmetrically.Hence it is not possible
+        \item[(b)  (c)]
+        Now if number of good chips are more, we can do the following to reduce the problem to half the size:
+        Before entering first step number of good chips must be greater than or equal to number of bad chips.
+        1)If n is even pair them into n/2 pairs and test.If n
+        is odd then form $\lfloor{n/2} \rfloor$ pairs and leave one chip and test these pairs
+        2)After testing if we get both good then throw one of them.Other wise throw both.
+        If n were even we are throwing atleast 1 bad chip when we are throwing both, so number of good chips $\geq$ bad chips in this case.If n is odd then we know number of good chips $\geq$ bad chips +1.Now even if we leave out any random chip, after the two steps, again number of goodchips $\geq$ badchips irrespective of type of left out chip.
+        So in every stage goodchips $\geq$ badchips.Now at the end,if one is left then since goodchips >= badchips, it has to be good chip.If two are left then we find the most recent chip that has been excluded because odd numbers are present(the last left out element while pairing).This must be good chip.Such a chip exists because we are starting with good chips strictly more than bad chips and the only way number of goodchips becomes equal to bad chips is when we left a good chip as a not paired element.(because if it were bad chip then number of good chips will be one less than bad chips in previous step and this is not possible).
+        Now the number of steps to find one good chip is:
+        T(n) then it is given by recurrence relation
+        $T(n) = T(\lfloor \frac{n}{2} \rfloor) + \lfloor \frac{n}{2} \rfloor$
+        From this relation 
+        $\frac{n}{2}-1 + \frac{n}{4}-1 + \frac{n}{8}-1 +..\leq T(n) \leq  \frac{n}{2} + \frac{n}{4} + \frac{n}{8} +..  = n$.
+        Hence T(n) is $\Theta(n)$.
+        Now once a good chip is found all other chips can also be found using this chip in n-1 pairwise checks.
+        Hence total number of pairwise checks is 
+        $\Theta(n) + n-1 = \Theta(n)$
+        
+    \end{enumerate}
     \item
-    \item
+    Since there are an odd number of elements, the middle of the array will be well defined. If the middle element is not equal to either the next or previous element, that will be the unique value. Else if the next element is equal to it, then unique element will be in the second half of the array, since the starting index of the middle pair is an odd number(assuming indexing starts from 1). Thus, the unique value must be in between the indices [mid+2,end]. Since the sub-array consists of odd elements as well, we can continue the same procedure till we find the unique value.
+    
+    If the middle element is equal to the previous element, then the unique value must be present in the first half of the array,$(i.e)$ in between the indices [start, mid-2]. Similar to the other case, we can keep decrementing the sub-array till we find the unique value.
+    
+    The time complexity of the algorithm will be of $O(logn)$ since after each check with the middle element, the sub-array is halved.
+    
+    \textbf{Pseudo-code} :
+    \begin{verbatim}
+        Unique(array, start, end){
+            if(start == end) return array[start]
+            middle = (start + end)/2
+            if(array[middle] != (array[middle+1] and array[middle-1])){
+                return array[middle]
+            }else if(array[middle] == array[middle+1]){
+                return Unique(array, middle+2, end)
+            }else if(array[middle] == array[middle-1]){
+                return Unique(array, start, middle-2)
+            }
+        }
+    \end{verbatim}
     \item %20
+    The algorithm for this is similar to binary search. In each step we prune half the array. The algorithm is as follows :
+    
+    1) Select a ball i 
+    
+    2) Initially start=1 and end=2n, now 
+    
+    Query 1: Take all the balls numbered from 1 to mid = (start+end)/2 = n, along with the $ith$ ball. Let the number of boxes for this query be $b_1$.  
+    
+    Query 2: Take all the balls numbered from 1 to mid, not including the $ith$ ball(if i$>$mid then all the balls from 1 to mid). Let the number of boxes for this query be $b_2$.
+    
+    3) Since there is only one ball less in query2,
+    
+    If that ball is paired with another ball in 1..mid then after removing the ball the number of boxes required to contain those balls remain the same \textit{(i.e)} $b_1 = b_2$
+    
+    If the ball is not paired with any other ball in 1..mid then after removing the ball, the number of boxes required to contain those balls become 1 less \textit{(i.e)} $b_1 = b_2 + 1$
+    
+    4) If $b_1 = b_2 + 1$, the pair of $ith$ ball is in mid+1..2n.
+    
+    If $b_1 = b_2$, the pair of $ith$ ball is in 1..mid.
+    
+    5) Apply recursion on the half which contains the pair, when only one ball is left that is the pair.
+    
+    \underline{Time complexity:}
+    
+    In each step, after 2 queries are asked we eliminate half,
+    
+    \[ \Rightarrow Q(2n) = Q(n) + 2\]
+    \[ \Rightarrow Q(n) = Q(n/2) + 2\]
+    \[.\]
+    \[.\]
+    \[.\]
+    \[ Q(1) = 0 \]
+    
+    Therefore, $Q(2n) = 2log(2n)$
+    
+    In each step we find a pair. So we need to perform n steps to find all the n pairs.
+    
+    \[ \Rightarrow Total queries = n(2log(2n)) = O(nlogn) \]
+        
     \item
+    \textbf{Algorithm:}
+    \begin{verbatim}
+    bool visited[] = {false};
+    int a = x0;
+    int b= f(x0),lambda,mu;
+    visited[x0] = true;
+    vector<int> storeCycle;
+    storeCycle.pb(a);
+    while(!visited[b])
+    {
+        visited[b] = true;
+        storeCycle.pb(b);
+        b = f(b);
+    }
+    int n = storeCycle.size();
+    for(int i = 0;i < n; i++)
+    {
+        if(storeCycle[i]==b)
+        {
+            lambda = i;
+            mu = n - i;
+            break;
+        }
+    }
+    \end{verbatim}
+    Lambda contains first index of cycle and mu contains length of cycle after algorithm.
+    \textbf{Time Complexity:}
+    \\Worst case time complexity is O(n) where n is size of S.
     \item
+    Swapping the elements array[1..k] and array[k+1..n] can be done using a recursive decremental algorithm, which first swaps the smaller set into the position it is supposed to be in, then applies the same for the remaining array.
+    
+    For example, let k < n/2. Then array[1..k] is swapped with the elements of array[n-k+1..n], reforming the array into array[(n-k+1..n), (k+1..n-k), (1..k)].
+    Next, the same is applied on the array[(n-k+1..n), (k+1..n-k)] part, $(i.e)$ array[1..n-k], since the array has been modified.
+    
+    If k>n/2, then array[k+1..n] is swapped with the elements of array[1..n-k], reforming the array into array[(k+1..n), (n-k+1..k), (1..n-k)]. Similarly, the function is called on array[n-k+1..n]
+    
+    \textbf{Pseudo-code} :
+    \begin{verbatim}
+        OrderedSwap(array,k){
+            n = array.size()
+            if(k<n/2){
+                for(int i=k;i>=1;i--){
+                    swap(array[i], array[n-k+i])
+                }
+                OrderedSwap(array[1..n-k], k)
+            }else{
+                for(int i=k+1;i<=n;i++){
+                    swap(array[i], array[i-k])
+                }
+                OrderedSwap(array[n-k+1..n], n-k)
+            }
+        }
+    \end{verbatim}
+    \underline{Number of swaps} : Let T(n,k) represent the number of swaps. Since swapping the first k elements is equivalent to swapping the last n-k elements, 
+    \[T(n, k) = T(n, n-k)\]
+    For each iteration, we do k swaps and continue to the next iteration. So, if k $\leq$ n/2
+    \[T(n,k) = T(n-k,k) + k\]
+    Else if k $\geq$ n/2, 
+    \[T(n,k) = T(n,n-k) = T(2n-k,k) + n-k\]
+    \underline{Base cases} : 
+    \[T(n,n) = T(n,0) = 0\]
+    Let n = $\lambda k$ + $\alpha$
+    \[T(n,k) = T(\lambda k+\alpha, k) = T(k+\alpha,k)+(\lambda -1)k\]
+    \[\Rightarrow T(n,k) = T(k+\alpha,(k+\alpha)-k) + (\lambda-1)k\]
+    \[\Rightarrow T(n,k) = T(k+\alpha,\alpha) + (\lambda-1)k\]
+    \[\Rightarrow T(n,k) = T(k,\alpha) + (\lambda-1)k +\alpha\]
+    If $\alpha$ = 0, then 
+    \[T(n,k) = T(k,0) + (\lambda-1)k + 0 = (\lambda-1)k\]
+    Since 0 $\le$ $\alpha$ $\le$ k,
+    \[0 \leq T(k,\alpha) \leq k\]
+    \[\Rightarrow (\lambda-1)k \leq T(n,k) \leq \lambda k\]
+    \[\therefore T(n,k) = O(n)\]
     \item
+    The problem can be converted into an equivalent summation problem.
+    
+    \[ \sum_{i_1=1}^{n} \sum_{i_2=1}^{i_1}.... \sum_{i_k=0}^{i_{k-1}} 1 \]
+    
+    This summation result gives the number of times the print statement is executed. 
+    
+    If we have a function,
+    
+    \[ f(x) = a_0 + a_1x + a_2x^2 + .... + a_nx^n.... \]
+    
+    If we multiply this function by $\frac{1}{1-x}$ we get a new series which is,
+    
+    \[ \frac{f(x)}{1-x} = f(x)*(1+x+x^2+....) \]
+    \[ \Rightarrow \frac{f(x)}{1-x} = a_0 + (a_0+a_1)x + (a_0+a_1+a_2)x^2 + ... + \sum_{i=0}^{n} a_ix^n... \]
+     Take, 
+    \[f_0(x) = \frac{1}{1-x} = 1+x+x^2+.....\]
+    \[ f_1(x) = \frac{f_0(x)}{1-x} = \frac{1}{(1-x)^2} = 1 + 2x + 3x^2 +....\]
+    \[ f_2(x) = \frac{f_1(x)}{1-x} = \frac{1}{(1-x)^3} = 1 + (1+2)x^2 + (1+2+3)x^3+ .......\]
+    \[ . \]
+    \[ . \]
+    \[ . \]
+    \[ f_k(x) = \frac{f_{k-1}(x)}{1-x} = \frac{1}{(1-x)^k} = p_0 + p_1x + p_2x^2 + .... \]
+    
+    The nth term of $f_{k-1}$ is the answer.
+    
+    We can see that,
+    
+    \[ \frac{d}{dx}f_n(x) = (n+1)f_{n+1}(x) \]
+    
+    coefficient of $x^{n-1}$ term in $f_1(x)$ = coefficient of $x^{n-1}$ in $\frac{1}{1} \frac{d}{dx}f_0(x)$ = $n$
+    
+    coefficient of $x^{n-1}$ term in $f_2(x)$ = coefficient of $x^{n-1}$ in $\frac{1}{2} \frac{d}{dx}f_1(x)$ = $\frac{n(n+1)}{2}$
+    
+    coefficient of $x^{n-1}$ term in $f_3(x)$ = coefficient of $x^{n-1}$ in $\frac{1}{3} \frac{d}{dx}f_2(x)$ = $\frac{n(n+1)(n+2)}{6}$
+    
+    \[ .\]
+    \[ .\]
+    \[ .\]
+    
+    coefficient of $x^{n-1}$ term in $f_k(x)$ = coefficient of $x^{n-1}$ in $\frac{1}{k} \frac{d}{dx}f_{k-1}(x)$ = $\frac{n(n+1)(n+2)...(n+k-1)}{1.2.3....k}$
+    
+    $\Rightarrow$ coefficient of $x^{n-1}$ in $f_k(x)$ = $\binom{n+k-1}{k}$
+    
+    Therefore,
+    
+    \[ \sum_{i_1=1}^{n} \sum_{i_2=1}^{i_1}.... \sum_{i_k=0}^{i_{k-1}} 1 = \binom{n+k-1}{k} \]
+    
+    Hence number of times the print statement is executed is $\binom{n+k-1}{k}$
+    
+    \textbf{Combinatorics proof:}
+    
+    The loop variables in that nested for loops form an increasing sequence \textit{(i.e)} $i_j \leq i_{j+1}$. So the problem is same as choosing k numbers from [1..n] (chosen numbers need not be distinct) since we can arrange any set of chosen numbers in an increasing sequence.
+    
+    Let, $x_i$ be the number of times $i$ is taken. Summation of $x_i$ must be equal to k because the number of for loops is equal to k.
+    
+    \[ x_1 + x_2 + .... + x_n = k \]
+    
+    No. of solutions for this partition = $\binom{(n-1)+k}{n-1}$
+    
+    \[ = \binom{n+k-1}{k} \]
+     
 \end{enumerate}
 
 \end{document}
